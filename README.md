@@ -7,5 +7,3 @@ The structure is intented to be agnostic to the configuration space with particu
 ## Integration with your code
 
 Right now, this is plain code that has to be manually integrated. In the future a proper library will be built around it.
-# ipp_tools
-# ipp_tools

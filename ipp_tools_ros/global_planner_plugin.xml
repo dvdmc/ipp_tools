@@ -1,0 +1,5 @@
+<library path="nav2_rrt_basic_plugin">
+	<class name="ipp_tools/nav2_interface/RRTBasic" type="ipp_tools::nav2_interface::RRTBasic" base_class_type="nav2_core::GlobalPlanner">
+	  <description>This a plugin which implements RRT in the navigation stack.</description>
+	</class>
+</library>
