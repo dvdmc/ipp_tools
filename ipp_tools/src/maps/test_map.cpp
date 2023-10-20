@@ -16,6 +16,12 @@ TestMap::TestMap(double resolution)
     // Set the circle radius
     circle_radius_ = circle_size_/resolution_;
 
+    // Set the map center
+    map_center_ = map_size_/2;
+
+    // Set the grid center
+    grid_center_ = grid_size_/2;
+
     // Initialize the map
     map_data_.resize(grid_size_);
     for (int i = 0; i < grid_size_; i++)
@@ -29,13 +35,13 @@ TestMap::TestMap(double resolution)
         for (int j = 0; j < grid_size_; j++)
         {
             // Check if the point is inside the circle
-            if (pow(i - map_center_, 2) + pow(j - map_center_, 2) <= pow(circle_radius_, 2))
+            if (pow(i - grid_center_, 2) + pow(j - grid_center_, 2) <= pow(circle_radius_, 2))
             {
-                map_data_[i][j] = 0;
+                map_data_[i][j] = 255;
             }
             else
             {
-                map_data_[i][j] = 255;
+                map_data_[i][j] = 0;
             }
         }
     }
@@ -43,47 +49,46 @@ TestMap::TestMap(double resolution)
 
 bool TestMap::isTraversable(const Eigen::Affine2d& point)
 {
-    // Get the map point
-    Eigen::Vector2i map_point;
-    worldToMap_(point, map_point);
-
-    // Check if the point is inside the map
-    if (map_point.x() < 0 || map_point.x() >= grid_size_ || map_point.y() < 0 || map_point.y() >= grid_size_)
+    // Get the value for that cell
+    unsigned char value = getVoxelState(point);
+    // Check if the cell is occupied
+    if (value == OCCUPIED)
     {
         return false;
-    }
-
-    // Check if the point is inside the circle
-    if (pow(map_point.x() - map_center_, 2) + pow(map_point.y() - map_center_, 2) <= pow(circle_radius_, 2))
-    {
-        return true;
     }
     else
     {
-        return false;
+        return true;
     }
+}
+
+bool TestMap::isPathTraversable(const Eigen::Affine2d& start, const Eigen::Affine2d& goal)
+{
+    Eigen::Vector2d direction = (goal.translation() - start.translation()).normalized();
+    Eigen::Vector2d point = start.translation();
+    while ((point - goal.translation()).norm() > resolution_)
+    {
+        point += direction*resolution_;
+        if (!isTraversable(Eigen::Affine2d(Eigen::Translation2d(point))))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool TestMap::exists(const Eigen::Affine2d& point)
 {
-    // Get the map point
-    Eigen::Vector2i map_point;
-    worldToMap_(point, map_point);
-
-    // Check if the point is inside the map
-    if (map_point.x() < 0 || map_point.x() >= grid_size_ || map_point.y() < 0 || map_point.y() >= grid_size_)
+    // Get the value for that cell
+    unsigned char value = getVoxelState(point);
+    // Check if the cell is known
+    if (value == UNKNOWN)
     {
         return false;
-    }
-
-    // Check if the point is inside the circle
-    if (pow(map_point.x() - map_center_, 2) + pow(map_point.y() - map_center_, 2) <= pow(circle_radius_, 2))
-    {
-        return true;
     }
     else
     {
-        return false;
+        return true;
     }
 }
 
@@ -96,11 +101,20 @@ unsigned char TestMap::getVoxelState(const Eigen::Affine2d& point)
     // Check if the point is inside the map
     if (map_point.x() < 0 || map_point.x() >= grid_size_ || map_point.y() < 0 || map_point.y() >= grid_size_)
     {
-        return 255;
+        return UNKNOWN;
     }
 
-    // Return the voxel state
-    return map_data_[map_point.x()][map_point.y()];
+    // Get the value for that cell
+    unsigned char value = map_data_[map_point.x()][map_point.y()];
+    // Check if the cell is occupied
+    if (value == 255)
+    {
+        return OCCUPIED;
+    }
+    else
+    {
+        return FREE;
+    }
 }
 
 bool TestMap::getVoxelCenter(const Eigen::Affine2d& point, Eigen::Affine2d& voxel_center)
@@ -138,6 +152,63 @@ void TestMap::worldToMap_(const Eigen::Affine2d& point, Eigen::Vector2i& map_poi
 
 }
 
+void TestMap::printMap()
+{
+    // Define a set of characters to represent different intensity levels
+    const char chars[] = ".%#*+=-:O";
+
+    // Scale the range of pixel values to match the number of characters
+    const int char_count = sizeof(chars) - 1;
+    const double scale = char_count / 256.0;
+
+    // Iterate through the 2D vector and print the ASCII art
+    for (int y = 0; y < grid_size_; y++) {
+        for (int x = 0; x < grid_size_; x++) {
+            int pixel_value = static_cast<int>(map_data_[y][x] * scale);
+            char ascii_char = chars[pixel_value];
+            std::cout << ascii_char;
+        }
+        std::cout << std::endl;
+    }
+}
+
+void TestMap::printRoute(const std::vector<Eigen::Affine2d>& route)
+{
+    // Define a set of characters to represent different intensity levels
+    const char chars[] = ".%#*+=-:O";
+
+    // Scale the range of pixel values to match the number of characters
+    const int char_count = sizeof(chars) - 1;
+    const double scale = char_count / 256.0;
+
+    // Iterate through the 2D vector and print the ASCII art
+    for (int y = 0; y < grid_size_; y++) {
+        for (int x = 0; x < grid_size_; x++) {
+            int pixel_value = static_cast<int>(map_data_[y][x] * scale);
+            // Check if the point is in the route
+            bool in_route = false;
+            int num_point_in_route = 0;
+            for (int i = 0; i < route.size(); i++)
+            {
+                Eigen::Vector2i map_point;
+                worldToMap_(route[i], map_point);
+                if (abs(map_point.x() - x) < 0.1 && abs(map_point.y() - y) < 0.1)
+                {
+                    in_route = true;
+                    num_point_in_route = 'x';
+                    break;
+                }
+            }
+            char ascii_char = chars[pixel_value];
+            if (in_route)
+            {
+                ascii_char = char(num_point_in_route);
+            }
+            std::cout << ascii_char;
+        }
+        std::cout << std::endl;
+    }
+}
 
 
 } // namespace maps

@@ -69,6 +69,14 @@ class Costmap2D : public OccupancyMap<Eigen::Affine2d>
         bool isTraversable(const Eigen::Affine2d &x);
         
         /**
+         * @brief Check if a path is traversable
+         * @param x Input point
+         * @return True if the path is traversable
+         */
+        bool isPathTraversable(const Eigen::Affine2d &start, const Eigen::Affine2d &goal);
+        
+
+        /**
          * @brief Get the voxel size
          * @return Voxel size
          */

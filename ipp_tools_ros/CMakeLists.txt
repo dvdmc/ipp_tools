@@ -54,7 +54,6 @@ set(dependencies_rrt_basic
 
 add_library(${library_rrt_basic} SHARED
   src/maps/2d_costmap.cpp
-  src/ros_utils.cpp
   src/rrt_nav2_interface.cpp
 )
 

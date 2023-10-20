@@ -13,6 +13,7 @@
  **********************************************************/
 #ifndef MAPS_TEST_MAP_H
 #define MAPS_TEST_MAP_H
+#include <iostream>
 
 #include <Eigen/Dense>
 
@@ -41,7 +42,13 @@ class TestMap : public OccupancyMap<Eigen::Affine2d>
 
         bool isTraversable(const Eigen::Affine2d& point);
 
+        bool isPathTraversable(const Eigen::Affine2d& start, const Eigen::Affine2d& goal);
+        
         bool exists(const Eigen::Affine2d& point);
+
+        void printMap();
+
+        void printRoute(const std::vector<Eigen::Affine2d>& route);
 
     private:
         void worldToMap_(const Eigen::Affine2d& point, Eigen::Vector2i& map_point);
@@ -51,7 +58,8 @@ class TestMap : public OccupancyMap<Eigen::Affine2d>
         double map_size_ = 10; //m
         int grid_size_;
         double resolution_;
-        int map_center_ = map_size_/2;
+        double map_center_;
+        int grid_center_;
         float circle_size_ = 1; //m
         int circle_radius_;
 

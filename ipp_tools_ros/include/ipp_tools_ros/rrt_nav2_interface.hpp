@@ -17,12 +17,15 @@
 #include <string>
 #include <memory>
 
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "nav_msgs/msg/path.hpp"
 
 #include "nav2_core/global_planner.hpp"
-#include "nav_msgs/msg/path.hpp"
 #include "nav2_util/robot_utils.hpp"
 #include "nav2_util/lifecycle_node.hpp"
 #include "nav2_costmap_2d/costmap_2d_ros.hpp"
@@ -30,7 +33,8 @@
 #include "maps/2d_costmap.h"
 #include "global/rrt.h"
 #include "common/limits.h"
-
+#include "ipp_tools_ros/ros_utils.hpp"
+#include "ipp_tools_ros/visualizers/path_visualizer.hpp"
 
 namespace ipp_tools
 {
@@ -105,8 +109,14 @@ namespace nav2_interface
             // Planner. Initialized in configure
             std::unique_ptr<global_planner::RRT<Eigen::Affine2d, common::Limits2D>> planner_;
 
+            // Visualizer. Initialized in configure
+            std::unique_ptr<visualizers::PathVisualizer> visualizer_;
+
             // The global frame of the costmap
             std::string global_frame_, name_;
+
+            // Save the last path
+            nav_msgs::msg::Path last_path_;
     };
 
 } // namespace nav2_interface

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <ipp_tools_ros/maps/2d_costmap.h>
 #include <nav2_costmap_2d/cost_values.hpp>
 
@@ -34,16 +36,23 @@ unsigned char Costmap2D::getVoxelState(const Eigen::Affine2d& point)
     unsigned int mx, my;
     if (worldToMap_(point.translation().x(), point.translation().y(), mx, my))
     {
-        switch (costmap_->getCost(mx, my))
+        // Use intervals from the costs
+        unsigned char cost = costmap_->getCost(mx, my);
+        if (cost == nav2_costmap_2d::LETHAL_OBSTACLE)
         {
-            case nav2_costmap_2d::LETHAL_OBSTACLE:
-                return OCCUPIED;
-            case nav2_costmap_2d::NO_INFORMATION:
-                return UNKNOWN;
-            case nav2_costmap_2d::FREE_SPACE:
-                return FREE;
-            default:
-                return UNKNOWN;
+            return OCCUPIED;
+        }
+        else if (cost == nav2_costmap_2d::FREE_SPACE)
+        {
+            return FREE;
+        }
+        else if (cost < nav2_costmap_2d::MAX_NON_OBSTACLE)
+        {
+            return FREE;
+        }
+        else
+        {
+            return UNKNOWN;
         }
     }
     return UNKNOWN;
@@ -57,9 +66,27 @@ bool Costmap2D::isTraversable(const Eigen::Affine2d& x)
     unsigned int mx, my;
     if (worldToMap_(x.translation().x(), x.translation().y(), mx, my))
     {
-        return costmap_->getCost(mx, my) == nav2_costmap_2d::FREE_SPACE;
+        return costmap_->getCost(mx, my) < nav2_costmap_2d::MAX_NON_OBSTACLE;
     }
     return false;
+}
+
+bool Costmap2D::isPathTraversable(const Eigen::Affine2d& start, const Eigen::Affine2d& goal)
+{
+    // Check if a path is traversable
+    // Get the direction of the path
+    Eigen::Vector2d direction = (goal.translation() - start.translation()).normalized();
+    // Iterate over the path
+    Eigen::Vector2d point = start.translation();
+    while ((point - goal.translation()).norm() > costmap_->getResolution())
+    {
+        point += direction*costmap_->getResolution();
+        if (!isTraversable(Eigen::Affine2d(Eigen::Translation2d(point))))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 double Costmap2D::getVoxelSize()

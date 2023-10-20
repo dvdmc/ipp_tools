@@ -32,7 +32,9 @@ public:
    * @brief Construct a new Global Planner object
    * @param map  map of the environment to use for planning
    */
-  GlobalPlanner(std::shared_ptr<maps::Map<Xn>> map) : map_(map) {}
+  GlobalPlanner() {}
+  // TODO: Do we need this constructor?
+  // We actually want to enforce a map in this class
 
   /**
    * @brief Create a plan from start to goal

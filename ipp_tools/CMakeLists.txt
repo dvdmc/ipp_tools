@@ -25,7 +25,6 @@ set(library_name ${PROJECT_NAME})
 
 add_library(${library_name} SHARED
   src/maps/test_map.cpp
-  src/global/rrt.cpp
 )
 
 ament_target_dependencies(${library_name}
@@ -47,6 +46,11 @@ install(TARGETS
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
+)
+
+install(TARGETS
+  rrt_test
+  DESTINATION lib
 )
 
 install(DIRECTORY include/

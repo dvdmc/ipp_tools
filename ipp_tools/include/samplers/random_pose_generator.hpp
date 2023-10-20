@@ -16,8 +16,9 @@
 #define RANDOM_POSE_GENERATOR_H
 
 #include <random>
-#include <Eigen/Dense>
 
+#include <Eigen/Dense>
+ 
 #include "common/limits.h"
 
 // Two templated classes for Affine2D and Affine3D
