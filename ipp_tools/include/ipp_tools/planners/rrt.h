@@ -11,24 +11,24 @@
  * --------------------------------------------------------
  *
  **********************************************************/
-#ifndef GLOBAL_RRT_H
-#define GLOBAL_RRT_H
+#ifndef PLANNERS_RRT_H
+#define PLANNERS_RRT_H
 
 #include <memory>
 #include <iostream>
 
-#include "common/nodes.h"
-#include "maps/map.h"
-#include "global/global_planner.h"
-#include "samplers/random_pose_generator.hpp"
+#include "ipp_tools/common/node.h"
+#include "ipp_tools/maps/map.h"
+#include "ipp_tools/planners/base_planner.h"
+#include "ipp_tools/samplers/random_pose_generator.hpp"
 
 namespace ipp_tools
 {
-namespace global_planner
+namespace planners
 {
 
 template <typename Xn, typename L>
-class RRT : public GlobalPlanner<Xn>
+class RRT : public BasePlanner
 {
 public:
   /**
@@ -43,18 +43,34 @@ public:
   ~RRT() = default;
 
   /**
-   * @brief Create a plan from start to goal
+   * @brief Sets up the parameters for the planner
    * @param start Start point
    * @param goal Goal point
-   * @param plan Output plan
-   * @return True if a plan is found
+   * @param goal_tolerance Goal tolerance
+   * @param max_iterations Maximum number of iterations
+   * @param max_distance Maximum distance between nodes
+   * @return True if the setup is successful
+   * 
+   * 
   */
-  bool createPlan(
+  bool setup(
     const Xn& start,
     const Xn& goal,
-    std::vector<Xn>& plan, double goal_tolerance = 0.1, int max_iterations = 1000, double max_distance = 0.5);
-    
+    double goal_tolerance = 0.1, int max_iterations = 1000, double max_distance = 0.5);  
+
+
+    /**
+     * @brief Plan using the configuration in the param map
+     */
+    void plan() override;
+
+    /**
+     * @brief Update the planner
+     */
+    void update() override;
+
 private:
+  
 
   /**
    * @brief Sample a free point from the map
@@ -130,9 +146,10 @@ private:
     }
 
     template <typename Xn, typename L>
-    bool RRT<Xn,L>::createPlan(const Xn &start, const Xn &goal,
-        std::vector<Xn> &plan, double goal_tolerance, int max_iterations, double max_distance)
+    bool RRT<Xn,L>::setup(const Xn &start, const Xn &goal,
+        double goal_tolerance, int max_iterations, double max_distance)
     {
+        path_.clear(); // Clear path
         start_ = std::make_unique<common::Node<Xn>>(start, 0, 0, 0, 0, nullptr);
         // This is a temporal special case
         end_ = std::make_unique<common::Node<Xn>>(goal, 0, 0, 0, 0, nullptr); 
@@ -147,6 +164,12 @@ private:
             return false;
         }
 
+        return true;
+    }
+
+    template <typename Xn, typename L>
+    void RRT<Xn,L>::plan()
+    {
         // The tree holds the ownership of the nodes
         tree_.clear();
         tree_.push_back(std::move(start_));
@@ -180,12 +203,18 @@ private:
             if (isCloseToGoal_(current_node))
             {
                 // Backtrack the tree from the goal to the start
-                return backtrack_(plan, current_node);
+                return backtrack_(path_, current_node);
             }
         }
         std::cout << "Could not find a plan after "<< max_iterations_ << "!" << std::endl;
 
         return false;
+    }
+
+    template <typename Xn, typename L>
+    void RRT<Xn,L>::update()
+    {
+        // Does nothing
     }
 
     template <typename Xn, typename L>
@@ -244,21 +273,21 @@ private:
     }
 
     template <typename Xn, typename L>
-    bool RRT<Xn,L>::backtrack_(std::vector<Xn> &plan, const common::Node<Xn>* final_node)
+    bool RRT<Xn,L>::backtrack_(std::vector<Xn> &path, const common::Node<Xn>* final_node)
     {
         // Backtrack the tree from the goal to the start
-        plan.clear();
+        path.clear(); // Make sure the path is empty
         const common::Node<Xn>* current_node = final_node;
         while (current_node != nullptr)
         {
-            plan.push_back(current_node->x);
+            path.push_back(current_node->x);
             current_node = current_node->parent;
         }
 
         return true;
     }
 
-} // namespace global_planner
+} // namespace PLANNERS_planner
 } // namespace ipp_tools
 
-#endif  // GLOBAL_RRT_H
+#endif  // PLANNERS_RRT_H

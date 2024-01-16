@@ -19,7 +19,7 @@
 
 #include <Eigen/Dense>
  
-#include "common/limits.h"
+#include "ipp_tools/common/limits.h"
 
 // Two templated classes for Affine2D and Affine3D
 
