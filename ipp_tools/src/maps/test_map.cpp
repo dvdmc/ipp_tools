@@ -1,4 +1,4 @@
-#include <maps/test_map.h>
+#include <ipp_tools/maps/test_map.h>
 
 namespace ipp_tools
 {

@@ -17,7 +17,7 @@
 
 #include <Eigen/Dense>
 
-#include <maps/occupancy_map.h>
+#include <ipp_tools/maps/occupancy_map.h>
 
 namespace ipp_tools
 {

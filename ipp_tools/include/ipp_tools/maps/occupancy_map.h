@@ -14,7 +14,7 @@
 #ifndef MAPS_OCCUPANCY_MAP_H
 #define MAPS_OCCUPANCY_MAP_H
 
-#include <maps/map.h>
+#include <ipp_tools/maps/map.h>
 
 namespace ipp_tools
 {

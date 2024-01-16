@@ -16,21 +16,18 @@
 
 #include <vector>
 
-namespace ipp_tools
-{
-namespace planners
-{
+namespace ipp_tools {
+namespace planners {
 
 template <typename Xn>
-class BasePlanner
-{
-public:
+class BasePlanner {
+ public:
   /**
    * @brief Abstract class for the Base Planner object
    * Any planner should inherit from this class and
    * implement the plan() and update() functions.
    * These functions will not have any parameter or output to allow
-   * abstraction. 
+   * abstraction.
    * Therefore, each class should set its own parameters in the constructor
    * or self implemented setup / set/ get methods.
    *  - plan() called once to plan
@@ -47,24 +44,26 @@ public:
   /**
    * @brief Plan using the configuration in the param map
    */
-  virtual void plan() = 0;
+  virtual bool plan() = 0;
 
   /**
    * @brief Update the planner
    */
-  virtual void update() = 0;
+  virtual bool update() = 0;
 
   /**
    * @brief Get the path
    * @return std::vector<Xn> Path
    */
-  std::vector<Xn> getPath() const { return path_; }
+  virtual std::vector<Xn> getPath() = 0;
 
-  protected:
-    std::vector<Xn> path_;
+ protected:
+  // NOTE: Access from derived classes must be done through
+  // this->member_variable due to the two-phase lookup
+  std::vector<Xn> path_;
 };
 
-} // namespace planners
-} // namespace ipp_tools
+}  // namespace planners
+}  // namespace ipp_tools
 
 #endif  // PLANNERS_PLANNER_H

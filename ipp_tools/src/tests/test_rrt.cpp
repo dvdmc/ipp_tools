@@ -1,9 +1,9 @@
 #include <fstream>
 #include <iostream>
 
-#include "global/rrt.h"
-#include "common/limits.h"
-#include "maps/test_map.h"
+#include "ipp_tools/planners/rrt.h"
+#include "ipp_tools/common/limits.h"
+#include "ipp_tools/maps/test_map.h"
 
 // This code is used to test the RRT algorithm
 // It generates an instance fo the test_map, which is a hardcoded map.
@@ -18,17 +18,18 @@ int main(int argc, char** argv)
     ipp_tools::maps::TestMap map(resolution);
     std::shared_ptr<ipp_tools::maps::TestMap> map_ptr = std::make_shared<ipp_tools::maps::TestMap>(map);
     // Initialize the RRT planner
-    ipp_tools::global_planner::RRT<Eigen::Affine2d, ipp_tools::common::Limits2D> rrt(map_ptr, limits);
+    ipp_tools::planners::RRT<Eigen::Affine2d, ipp_tools::common::Limits2D> rrt(map_ptr, limits);
 
     // Set the start and goal points
     Eigen::Affine2d start(Eigen::Translation2d(-4.5, -4.5));
     Eigen::Affine2d goal(Eigen::Translation2d(4.5, 4.5));
 
     // Plan the route
-    std::vector<Eigen::Affine2d> route;
     std::cout << "Creating plan" << std::endl;
-    rrt.createPlan(start, goal, route);
+    rrt.setup(start, goal);
 
+    std::vector<Eigen::Affine2d> route = rrt.getPath();
+    
     // Save the route in a file
     std::ofstream file;
     file.open("route.txt");
