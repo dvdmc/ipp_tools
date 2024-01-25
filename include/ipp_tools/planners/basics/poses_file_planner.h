@@ -16,14 +16,14 @@
 #ifndef PLANNERS_POSES_FILE_PLANNER_H
 #define PLANNERS_POSES_FILE_PLANNER_H
 
-#include <ipp_tools/planners/base_planner.h>
-
 #include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
+
+#include <ipp_tools/planners/base_planner.h>
 
 namespace ipp_tools {
 namespace planners {

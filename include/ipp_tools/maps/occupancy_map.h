@@ -27,6 +27,8 @@ template <typename Xn>
 class OccupancyMap : public Map<Xn>
 {
     public:
+        // constructor
+        OccupancyMap() = default;
     
         // states
         const static unsigned char OCCUPIED = 0;  // NOLINT

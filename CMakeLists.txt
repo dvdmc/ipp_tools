@@ -94,3 +94,12 @@ target_link_libraries(test_rrt
   ${catkin_LIBRARIES}
   Eigen3::Eigen
 )
+
+add_executable(test_actions
+  src/tests/test_actions.cpp
+)
+target_link_libraries(test_actions  
+  ipp_tools_tests
+  ${catkin_LIBRARIES}
+  Eigen3::Eigen
+)

@@ -4,7 +4,7 @@ namespace ipp_tools {
 namespace planners {
 namespace basics {
 
-PosesFilePlanner::PosesFilePlanner() {}
+PosesFilePlanner::PosesFilePlanner() : BasePlanner() {}
 
 
 bool PosesFilePlanner::setup(const std::string& file_path, int subsample) {
