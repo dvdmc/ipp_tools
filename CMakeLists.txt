@@ -5,6 +5,10 @@ if(NOT DEFINED WITH_AIRSIM)
   set(WITH_AIRSIM ON)
 endif()
 
+if(NOT DEFINED WITH_VOXBLOX)
+  set(WITH_VOXBLOX OFF)
+endif()
+
 if(WITH_AIRSIM)
   message(STATUS "Building with AirSim")
   # set this to path to AirSim root folder if you want your catkin workspace in a custom directory
@@ -29,19 +33,39 @@ find_package(catkin REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS)
 
+if(WITH_VOXBLOX)
+  find_package(catkin REQUIRED COMPONENTS
+  voxblox
+  voxblox_ros
+  voxblox_msgs
+)
+endif()
+
+# Set libraries depending on optional dependencies
+set(CATKIN_PROJECT_LIBRARIES ipp_tools)
+if(WITH_AIRSIM)
+  set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_airsim)
+endif()
+if(WITH_VOXBLOX)
+  set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_voxblox)
+endif()
+
 catkin_package(
   INCLUDE_DIRS include
   ${EIGEN3_INCLUDE_DIRS}
-  LIBRARIES ipp_tools ipp_tools_tests
+  LIBRARIES ${CATKIN_PROJECT_LIBRARIES}
   CATKIN_DEPENDS
   DEPENDS Eigen3
 )
 
-if(WITH_AIRSIM)
 include_directories(
   include
-  ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS} # Includes voxblox
   ${EIGEN3_INCLUDE_DIRS}
+)
+
+if(WITH_AIRSIM)
+include_directories(
   ${AIRSIM_ROOT}/AirLib/deps/eigen3
   ${AIRSIM_ROOT}/AirLib/include
   ${RPC_LIB_INCLUDES}
@@ -50,31 +74,34 @@ include_directories(
   # Set because Boost is an internal dependency, not transitive.
   ${Boost_INCLUDE_DIRS}
 )
-else()
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
+endif()
+
+add_library(ipp_tools
+src/planners/basics/poses_file_planner.cpp
+)
+target_link_libraries(ipp_tools  
+  ${catkin_LIBRARIES}
+  Eigen3::Eigen
+)
+
+if(WITH_AIRSIM)
+add_library(ipp_tools_airsim
+  src/planners/bridges/airsim_planner_bridge.cpp
+)
+target_link_libraries(ipp_tools_airsim  
+  ${catkin_LIBRARIES}
+  Eigen3::Eigen
 )
 endif()
 
-if(WITH_AIRSIM)
-add_library(ipp_tools
-  src/planners/basics/poses_file_planner.cpp
-  src/planners/bridges/airsim_planner_bridge.cpp
+if(WITH_VOXBLOX)
+add_library(ipp_tools_voxblox
+  src/maps/voxblox_map.cpp
 )
-target_link_libraries(ipp_tools  
+target_link_libraries(ipp_tools_voxblox  
   ${catkin_LIBRARIES}
   Eigen3::Eigen
-)
 
-else()
-add_library(ipp_tools
-  src/planners/basics/poses_file_planner.cpp
-)
-target_link_libraries(ipp_tools  
-  ${catkin_LIBRARIES}
-  Eigen3::Eigen
 )
 endif()
 

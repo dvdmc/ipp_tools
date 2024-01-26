@@ -47,7 +47,7 @@ TestMap::TestMap(double resolution)
     }
 }
 
-bool TestMap::isTraversable(const Eigen::Affine2d& point)
+bool TestMap::isTraversable(const Eigen::Vector2d& point)
 {
     // Get the value for that cell
     unsigned char value = getVoxelState(point);
@@ -62,14 +62,14 @@ bool TestMap::isTraversable(const Eigen::Affine2d& point)
     }
 }
 
-bool TestMap::isPathTraversable(const Eigen::Affine2d& start, const Eigen::Affine2d& goal)
+bool TestMap::isPathTraversable(const Eigen::Vector2d& start, const Eigen::Vector2d& goal)
 {
-    Eigen::Vector2d direction = (goal.translation() - start.translation()).normalized();
-    Eigen::Vector2d point = start.translation();
-    while ((point - goal.translation()).norm() > resolution_)
+    Eigen::Vector2d direction = (goal - start).normalized();
+    Eigen::Vector2d point = start;
+    while ((point - goal).norm() > resolution_)
     {
         point += direction*resolution_;
-        if (!isTraversable(Eigen::Affine2d(Eigen::Translation2d(point))))
+        if (!isTraversable(point))
         {
             return false;
         }
@@ -77,7 +77,7 @@ bool TestMap::isPathTraversable(const Eigen::Affine2d& start, const Eigen::Affin
     return true;
 }
 
-bool TestMap::exists(const Eigen::Affine2d& point)
+bool TestMap::exists(const Eigen::Vector2d& point)
 {
     // Get the value for that cell
     unsigned char value = getVoxelState(point);
@@ -92,7 +92,7 @@ bool TestMap::exists(const Eigen::Affine2d& point)
     }
 }
 
-unsigned char TestMap::getVoxelState(const Eigen::Affine2d& point)
+unsigned char TestMap::getVoxelState(const Eigen::Vector2d& point)
 {
     // Get the map point
     Eigen::Vector2i map_point;
@@ -117,7 +117,7 @@ unsigned char TestMap::getVoxelState(const Eigen::Affine2d& point)
     }
 }
 
-bool TestMap::getVoxelCenter(const Eigen::Affine2d& point, Eigen::Affine2d& voxel_center)
+bool TestMap::getVoxelCenter(const Eigen::Vector2d& point, Eigen::Vector2d& voxel_center)
 {
     // Get the map point
     Eigen::Vector2i map_point;
@@ -130,18 +130,18 @@ bool TestMap::getVoxelCenter(const Eigen::Affine2d& point, Eigen::Affine2d& voxe
     }
 
     // Get the voxel center
-    voxel_center.translation().x() = map_point.x()*resolution_ - map_size_/2 + resolution_/2;
-    voxel_center.translation().y() = map_point.y()*resolution_ - map_size_/2 + resolution_/2;
+    voxel_center.x() = map_point.x()*resolution_ - map_size_/2 + resolution_/2;
+    voxel_center.y() = map_point.y()*resolution_ - map_size_/2 + resolution_/2;
 
     return true;
 
 }
 
-void TestMap::worldToMap_(const Eigen::Affine2d& point, Eigen::Vector2i& map_point)
+void TestMap::worldToMap_(const Eigen::Vector2d& point, Eigen::Vector2i& map_point)
 {
     // Get the map point
-    map_point.x() = (point.translation().x() + map_size_/2)/resolution_;
-    map_point.y() = (point.translation().y() + map_size_/2)/resolution_;
+    map_point.x() = (point.x() + map_size_/2)/resolution_;
+    map_point.y() = (point.y() + map_size_/2)/resolution_;
 
     // Check if the point is inside the map
     if (map_point.x() < 0 || map_point.x() >= grid_size_ || map_point.y() < 0 || map_point.y() >= grid_size_)
@@ -172,7 +172,7 @@ void TestMap::printMap()
     }
 }
 
-void TestMap::printRoute(const std::vector<Eigen::Affine2d>& route)
+void TestMap::printRoute(const std::vector<Eigen::Vector2d>& route)
 {
     // Define a set of characters to represent different intensity levels
     const char chars[] = ".%#*+=-:O";

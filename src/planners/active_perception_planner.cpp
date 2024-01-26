@@ -9,13 +9,12 @@ ActivePerceptionPlanner::ActivePerceptionPlanner() : BasePlanner() {}
 
 bool ActivePerceptionPlanner::setup(
     const float& point_size, const common::CameraData& camera_data,
-    const common::ActionSpace<4>& action_space) {
+    const common::ActionSpace<4>& action_space, std::shared_ptr<value::ViewpointEvaluator>& viewpoint_evaluator) {
     point_size_ = point_size;
     camera_data_ = std::make_shared<common::CameraData>(camera_data);
     action_space_ = std::make_shared<common::ActionSpace<4>>(action_space);
 
-    viewpoint_evaluator_ =
-        std::make_shared<value::ViewpointEvaluator>(camera_data_);
+    viewpoint_evaluator = viewpoint_evaluator;
 
     return true;
 }
@@ -44,7 +43,7 @@ bool ActivePerceptionPlanner::update() {
         // TODO: Check limits and traversability
         viewpoint_candidates[i] = viewpoint_candidate;
         v_viewpoint_value[i] =
-            viewpoint_evaluator_->evaluateViewpointVisibleFrontiers(
+            viewpoint_evaluator->evaluateViewpointVisibleFrontiers(
                 viewpoint_candidate, point_size_, frontier_voxels_,
                 surface_voxels_);
     }

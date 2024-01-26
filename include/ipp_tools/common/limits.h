@@ -1,7 +1,9 @@
 /***********************************************************
  *
  * @file: limits.h
- * @breif: Contains simple structures to define limits in different configuration spaces
+ * @breif: Contains simple structures to define limits in 
+ *         different configuration spaces 
+ *          TODO: Reimplement through the actions class
  * @author: David Morilla-Cabello
  * @update: TODO
  * @version: 1.0

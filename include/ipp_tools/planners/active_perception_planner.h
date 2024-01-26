@@ -48,7 +48,9 @@ class ActivePerceptionPlanner : public BasePlanner<Eigen::Affine3d> {
      */
     bool setup(const float &point_size, 
                const common::CameraData& camera_data, 
-               const common::ActionSpace<4>& action_space);
+               const common::ActionSpace<4>& action_space,
+               std::shared_ptr<value::ViewpointEvaluator>& viewpoint_evaluator);
+               // TODO: The last might not be neccessary but it is now for testing
 
     /**
      * @brief Plan using the configuration in the param map
@@ -75,6 +77,9 @@ class ActivePerceptionPlanner : public BasePlanner<Eigen::Affine3d> {
      */
     std::vector<Eigen::Affine3d> getPath() override;
 
+   // Viewpoint evaluator can be accessed from outside for visibility checks
+    std::shared_ptr<value::ViewpointEvaluator> viewpoint_evaluator;
+
     private:
     
     Eigen::Affine3f current_pose_; // Current pose of the camera
@@ -85,7 +90,6 @@ class ActivePerceptionPlanner : public BasePlanner<Eigen::Affine3d> {
 
     std::shared_ptr<common::CameraData> camera_data_;
     std::shared_ptr<common::ActionSpace<4>> action_space_;
-    std::shared_ptr<value::ViewpointEvaluator> viewpoint_evaluator_;
 };  // class ActivePerceptionPlanner
 
 }  // namespace planners

@@ -25,14 +25,14 @@
 namespace ipp_tools {
 namespace planners {
 
-template <typename Xn, typename L>
+template <typename Xn, typename Mn, typename L>
 class RRT : public BasePlanner <Xn>{
  public:
   /**
    * @brief Construct a new Global Planner object
    * @param map  map of the environment to use for planning
    */
-  RRT(std::shared_ptr<maps::Map<Xn>> map, const L& limits);
+  RRT(std::shared_ptr<maps::Map<Mn>> map, const L& limits);
 
   /**
    * @brief Destroy the Global Planner object
@@ -114,7 +114,7 @@ class RRT : public BasePlanner <Xn>{
    */
   bool backtrack_(std::vector<Xn>& plan, const common::Node<Xn>* final_node);
 
-  std::shared_ptr<maps::Map<Xn>> map_;
+  std::shared_ptr<maps::Map<Mn>> map_;
   std::unique_ptr<samplers::RandomPoseGenerator<Xn>> sampler_;
   std::unique_ptr<common::Node<Xn>> start_, end_;
   std::vector<std::unique_ptr<common::Node<Xn>>> tree_;
@@ -123,14 +123,14 @@ class RRT : public BasePlanner <Xn>{
   int max_iterations_;
 };
 
-template <typename Xn, typename L>
-RRT<Xn, L>::RRT(std::shared_ptr<maps::Map<Xn>> map, const L& limits)
+template <typename Xn, typename Mn, typename L>
+RRT<Xn, Mn, L>::RRT(std::shared_ptr<maps::Map<Mn>> map, const L& limits)
     : map_(map), limits_(limits) {
   sampler_ = std::make_unique<samplers::RandomPoseGenerator<Xn>>(limits_);
 }
 
-template <typename Xn, typename L>
-bool RRT<Xn, L>::setup(const Xn& start, const Xn& goal, double goal_tolerance,
+template <typename Xn, typename Mn, typename L>
+bool RRT<Xn, Mn, L>::setup(const Xn& start, const Xn& goal, double goal_tolerance,
                        int max_iterations, double max_distance) {
   this->path_.clear();  // Clear path
   start_ = std::make_unique<common::Node<Xn>>(start, 0, 0, 0, 0, nullptr);
@@ -141,7 +141,7 @@ bool RRT<Xn, L>::setup(const Xn& start, const Xn& goal, double goal_tolerance,
   max_distance_ = max_distance;
 
   // Check if the start and goal are valid
-  if (!map_->isTraversable(start_->x) || !map_->isTraversable(end_->x)) {
+  if (!map_->isTraversable(start_->x.translation()) || !map_->isTraversable(end_->x.translation())) {
     std::cout << "Start or goal are not traversable!" << std::endl;
     return false;
   }
@@ -149,8 +149,8 @@ bool RRT<Xn, L>::setup(const Xn& start, const Xn& goal, double goal_tolerance,
   return true;
 }
 
-template <typename Xn, typename L>
-bool RRT<Xn, L>::plan() {
+template <typename Xn, typename Mn, typename L>
+bool RRT<Xn, Mn, L>::plan() {
   // The tree holds the ownership of the nodes
   tree_.clear();
   tree_.push_back(std::move(start_));
@@ -170,7 +170,7 @@ bool RRT<Xn, L>::plan() {
     const common::Node<Xn>* nearest = nearest_(sample);
     // Check if the path between the nearest node and the sample is
     // free
-    if (!map_->isPathTraversable(nearest->x, sample)) {
+    if (!map_->isPathTraversable(nearest->x.translation(), sample.translation())) {
       continue;
     }
     // Add a new node to the tree
@@ -189,34 +189,34 @@ bool RRT<Xn, L>::plan() {
   return false;
 }
 
-template <typename Xn, typename L>
-bool RRT<Xn, L>::update() {
+template <typename Xn, typename Mn, typename L>
+bool RRT<Xn, Mn, L>::update() {
   // Does nothing
     return true;
 }
 
-template <typename Xn, typename L>
-std::vector<Xn> RRT<Xn, L>::getPath() {
+template <typename Xn, typename Mn, typename L>
+std::vector<Xn> RRT<Xn, Mn, L>::getPath() {
   if (this->path_.empty()) {
     std::cout << "Path is empty" << std::endl;
   }
   return this->path_;
 }
 
-template <typename Xn, typename L>
-bool RRT<Xn, L>::sampleFree_(Xn& sample) {
+template <typename Xn, typename Mn, typename L>
+bool RRT<Xn, Mn, L>::sampleFree_(Xn& sample) {
   // Add a check for max iterations
   int max_iterations = 10000;
   int i = 0;
   do {
     sampler_->getPose(sample);
     i++;
-  } while (!map_->isTraversable(sample) && i < max_iterations);
+  } while (!map_->isTraversable(sample.translation()) && i < max_iterations);
   return i < max_iterations;
 }
 
-template <typename Xn, typename L>
-const common::Node<Xn>* RRT<Xn, L>::nearest_(const Xn& sample) {
+template <typename Xn, typename Mn, typename L>
+const common::Node<Xn>* RRT<Xn, Mn, L>::nearest_(const Xn& sample) {
   // Find the nearest node by iterating over the tree and finding the
   // node with the minimum distance to the sample
   common::Node<Xn>* nearest;
@@ -232,8 +232,8 @@ const common::Node<Xn>* RRT<Xn, L>::nearest_(const Xn& sample) {
   return nearest;
 }
 
-template <typename Xn, typename L>
-void RRT<Xn, L>::addNode_(const Xn& sample, const common::Node<Xn>* nearest) {
+template <typename Xn, typename Mn, typename L>
+void RRT<Xn, Mn, L>::addNode_(const Xn& sample, const common::Node<Xn>* nearest) {
   // Add a new node to the tree by extending the nearest node towards
   // the sample. If the sample is too far from the nearest node, the
   // new node is added at the maximum distance from the nearest node
@@ -262,14 +262,14 @@ void RRT<Xn, L>::addNode_(const Xn& sample, const common::Node<Xn>* nearest) {
   tree_.push_back(std::move(new_node));
 }
 
-template <typename Xn, typename L>
-bool RRT<Xn, L>::isCloseToGoal_(const common::Node<Xn>* node) {
+template <typename Xn, typename Mn, typename L>
+bool RRT<Xn, Mn, L>::isCloseToGoal_(const common::Node<Xn>* node) {
   // Check if a node is close enough to the goal
   return node->h < goal_tolerance_;
 }
 
-template <typename Xn, typename L>
-bool RRT<Xn, L>::backtrack_(std::vector<Xn>& path,
+template <typename Xn, typename Mn, typename L>
+bool RRT<Xn, Mn, L>::backtrack_(std::vector<Xn>& path,
                             const common::Node<Xn>* final_node) {
   // Backtrack the tree from the goal to the start
   path.clear();  // Make sure the path is empty

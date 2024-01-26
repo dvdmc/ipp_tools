@@ -21,7 +21,7 @@ namespace ipp_tools
 namespace maps
 {
 /**
- * @brief Basic Map class templated to work with different configuration spaces.
+ * @brief Basic Occupancy map class templated to work with different configuration spaces.
 */
 template <typename Xn>
 class OccupancyMap : public Map<Xn>

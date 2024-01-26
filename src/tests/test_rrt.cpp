@@ -18,7 +18,7 @@ int main(int argc, char** argv)
     ipp_tools::maps::TestMap map(resolution);
     std::shared_ptr<ipp_tools::maps::TestMap> map_ptr = std::make_shared<ipp_tools::maps::TestMap>(map);
     // Initialize the RRT planner
-    ipp_tools::planners::RRT<Eigen::Affine2d, ipp_tools::common::Limits2D> rrt(map_ptr, limits);
+    ipp_tools::planners::RRT<Eigen::Affine2d, Eigen::Vector2d, ipp_tools::common::Limits2D> rrt(map_ptr, limits);
 
     // Set the start and goal points
     Eigen::Affine2d start(Eigen::Translation2d(-4.5, -4.5));
@@ -29,16 +29,21 @@ int main(int argc, char** argv)
     rrt.setup(start, goal);
 
     std::vector<Eigen::Affine2d> route = rrt.getPath();
-    
+    // Transform to points
+    std::vector<Eigen::Vector2d> route_points;
+    for (int i = 0; i < route.size(); i++)
+    {
+        route_points.push_back(route[i].translation());
+    }
     // Save the route in a file
     std::ofstream file;
     file.open("route.txt");
     for (int i = 0; i < route.size(); i++)
     {
-        file << route[i].translation().x() << " " << route[i].translation().y() << std::endl;
+        file << route_points[i].x() << " " << route_points[i].y() << std::endl;
     }
     file.close();
 
-    map_ptr->printRoute(route);
+    map_ptr->printRoute(route_points);
     return 0;
 }
