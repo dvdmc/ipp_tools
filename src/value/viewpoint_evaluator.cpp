@@ -184,7 +184,9 @@ float ViewpointEvaluator::evaluateViewpointVisibleFrontiers(
 float ViewpointEvaluator::evaluateViewpointVisibleExploreExploit(
     const Eigen::Affine3f &camera, const float &point_size,
     const std::vector<Eigen::Vector3f> &frontier_voxels,
-    const std::vector<Eigen::Vector3f> &surface_voxels) {
+    const std::vector<Eigen::Vector3f> &surface_voxels,
+    SemanticValueGainEstimation *semantic_value_gain_estimation,
+    SemanticEstimationModel* semantic_estimation_model) {
         
     // Evaluate which voxels are visible from the camera. Surface and frontier
     // voxels are evaluated together
@@ -205,6 +207,17 @@ float ViewpointEvaluator::evaluateViewpointVisibleExploreExploit(
             visible_frontier_voxels++;
         }
     }
+
+    // Compute the semantic value gain
+    float semantic_value_gain = 0.0;
+    for (int i = 0; i < frontier_voxels.size(); i++) {
+        if (v_is_point_visible[i]) {
+            semantic_value_gain += semantic_value_gain_estimation->evaluateInformationGain(
+                camera, frontier_voxels[i], semantic_estimation_model);
+        }
+    }
+
+    // Compute the value as the number of visible *surface voxels* (ignore frontier voxels)
     return visible_frontier_voxels;
 }
 

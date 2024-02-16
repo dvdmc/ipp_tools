@@ -22,6 +22,8 @@
 
 #include <ipp_tools/common/cameras.h>
 
+#include <ipp_tools/value/semantic_value_gain_estimation.hpp>
+
 namespace ipp_tools {
 namespace value {
 
@@ -128,13 +130,9 @@ class ViewpointEvaluator {
     float evaluateViewpointVisibleExploreExploit(
         const Eigen::Affine3f &camera, const float &point_size,
         const std::vector<Eigen::Vector3f> &frontier_voxels,
-        const std::vector<Eigen::Vector3f> &surface_voxels);
-
-    // float evaluateViewpointFrontiersAndEntropy(
-    //     const Eigen::Affine3f &camera,
-    //     const std::vector<Eigen::Vector3f> &frontier_voxels,
-    //     const std::vector<Eigen::Vector3f> &surface_voxels,
-    //     const std::vector<VoxelInfo *> &voxels);
+        const std::vector<Eigen::Vector3f> &surface_voxels,
+        SemanticValueGainEstimation *semantic_value_gain_estimation,
+        SemanticEstimationModel* semantic_estimation_model);
 
    private:
     std::unique_ptr<common::CameraData> camera_data_;

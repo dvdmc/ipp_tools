@@ -31,10 +31,13 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
 find_package(catkin REQUIRED)
 
-find_package(catkin REQUIRED COMPONENTS)
+find_package(catkin REQUIRED COMPONENTS
+  semantic_mapping
+)
 
 if(WITH_VOXBLOX)
   find_package(catkin REQUIRED COMPONENTS
+  semantic_mapping
   voxblox
   voxblox_ros
   voxblox_msgs
@@ -42,12 +45,12 @@ if(WITH_VOXBLOX)
 endif()
 
 # Set libraries depending on optional dependencies
-set(CATKIN_PROJECT_LIBRARIES ipp_tools)
+set(CATKIN_PROJECT_LIBRARIES ipp_tools) # Core library
 if(WITH_AIRSIM)
-  set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_airsim)
+  set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_airsim) # AirSim bridge
 endif()
 if(WITH_VOXBLOX)
-  set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_voxblox)
+  set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_voxblox) # Voxblox map
 endif()
 
 catkin_package(
@@ -79,6 +82,7 @@ endif()
 add_library(ipp_tools
 src/planners/basics/poses_file_planner.cpp
 src/value/viewpoint_evaluator.cpp
+src/value/semantic_value_gain_estimation.cpp
 )
 target_link_libraries(ipp_tools  
   ${catkin_LIBRARIES}
