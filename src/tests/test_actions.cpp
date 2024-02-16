@@ -10,9 +10,9 @@ int main(int argc, char** argv)
 {
     std::cout << "Starting test" << std::endl;
     // Initialize the action space
-    ipp_tools::common::ActionSpace<4> action_space({"x", "y", "z", "yaw"}, Eigen::Vector4d(-1, -1, -1, -1), Eigen::Vector4d(1, 1, 1, 1));
+    ipp_tools::common::ActionSpace<4> action_space({"x", "y", "z", "yaw"}, Eigen::Vector4f(-1, -1, -1, -1), Eigen::Vector4f(1, 1, 1, 1));
     // Sample actions
-    std::vector<Eigen::Matrix<double, 4, 1>> actions = action_space.sample(3); // 4 per axis
+    std::vector<Eigen::Matrix<float, 4, 1>> actions = action_space.sample(3); // 4 per axis
 
     // Print the sampled actions
     for (int i = 0; i < actions.size(); i++)

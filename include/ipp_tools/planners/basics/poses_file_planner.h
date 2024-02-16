@@ -29,7 +29,7 @@ namespace ipp_tools {
 namespace planners {
 namespace basics {
 
-class PosesFilePlanner : public BasePlanner<Eigen::Affine3d> {
+class PosesFilePlanner : public BasePlanner<Eigen::Affine3f> {
  public:
   /**
    * @brief Construct a new Poses File Planner object
@@ -61,9 +61,9 @@ class PosesFilePlanner : public BasePlanner<Eigen::Affine3d> {
 
   /**
    * @brief Get the path
-   * @return std::vector<Eigen::Affine3d> Path
+   * @return std::vector<Eigen::Affine3f> Path
    */
-  std::vector<Eigen::Affine3d> getPath() override;
+  std::vector<Eigen::Affine3f> getPath() override;
 
  private:
   int subsample_;

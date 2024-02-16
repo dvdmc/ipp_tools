@@ -30,9 +30,9 @@ bool PosesFilePlanner::plan() {
                    [](const std::string& val) { return std::stof(val); });
     // Add pose to path vector with subsample rate
     if (i % subsample_ == 0) {
-      Eigen::Translation3d translation(floats[0], floats[1], floats[2]);
-      Eigen::Quaterniond rotation(floats[6], floats[3], floats[4], floats[5]);
-      Eigen::Affine3d pose = translation * rotation;
+      Eigen::Translation3f translation(floats[0], floats[1], floats[2]);
+      Eigen::Quaternionf rotation(floats[6], floats[3], floats[4], floats[5]);
+      Eigen::Affine3f pose = translation * rotation;
       this->path_.push_back(pose);
     }
     i++;
@@ -43,7 +43,7 @@ bool PosesFilePlanner::plan() {
 
 bool PosesFilePlanner::update() {return true;}
 
-std::vector<Eigen::Affine3d> PosesFilePlanner::getPath() 
+std::vector<Eigen::Affine3f> PosesFilePlanner::getPath() 
 {
     if (this->path_.empty()) std::cout << "Path is empty" << std::endl;
     return this->path_;

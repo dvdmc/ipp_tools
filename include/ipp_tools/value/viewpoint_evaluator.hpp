@@ -16,6 +16,8 @@
 #ifndef VALUE_VIEWPOINT_EVALUATOR_HPP
 #define VALUE_VIEWPOINT_EVALUATOR_HPP
 
+#include <memory>
+
 #include <Eigen/Dense>
 
 #include <ipp_tools/common/cameras.h>
@@ -43,6 +45,22 @@ class ViewpointEvaluator {
      */
     bool isPointVisible(const Eigen::Vector3f &point,
                         const Eigen::Affine3f &camera);
+
+    /**
+     * @brief Get camera data
+     * @return CameraData
+     */
+    const common::CameraData &getCameraData() const { return *camera_data_; }
+
+    /**
+     * @brief Get the bounding box of the camera frustrum including camera
+     * rotation TODO: Improve
+     * @param camera Camera pose
+     * @param min Minimum point of the bounding box
+     * @param max Maximum point of the bounding box
+     */
+    void getBoundingBoxFrustum(const Eigen::Affine3f &camera,
+                               Eigen::Vector3f &min, Eigen::Vector3f &max);
 
     /**
      * @brief Checks if the point if they are visible in the camera frustrum or
@@ -89,12 +107,26 @@ class ViewpointEvaluator {
      *
      * @param camera  camera pose
      * @param frontier_voxels list of frontier voxels
-     * @param surface_voxels list of surface voxels
+     * @param surface_voxels list of surface voxels that can act as occluders
+     * but are not considered for the volumetric gain
      * @return float volumetric gain
      */
     float evaluateViewpointVisibleFrontiers(
-        const Eigen::Affine3f &camera,
-        const float &point_size,
+        const Eigen::Affine3f &camera, const float &point_size,
+        const std::vector<Eigen::Vector3f> &frontier_voxels,
+        const std::vector<Eigen::Vector3f> &surface_voxels);
+
+    /**
+     * @brief Evaluate a viewpoint for volumetric gain and semantic gain
+     * checking for visibility and occlusion
+     *
+     * @param camera  camera pose
+     * @param frontier_voxels list of frontier voxels
+     * @param surface_voxels list of surface voxels
+     * @return float volumetric gain
+     */
+    float evaluateViewpointVisibleExploreExploit(
+        const Eigen::Affine3f &camera, const float &point_size,
         const std::vector<Eigen::Vector3f> &frontier_voxels,
         const std::vector<Eigen::Vector3f> &surface_voxels);
 
@@ -105,7 +137,7 @@ class ViewpointEvaluator {
     //     const std::vector<VoxelInfo *> &voxels);
 
    private:
-    const common::CameraData camera_data_;
+    std::unique_ptr<common::CameraData> camera_data_;
 };
 
 }  // namespace value

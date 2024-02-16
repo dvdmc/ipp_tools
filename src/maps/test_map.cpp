@@ -5,7 +5,7 @@ namespace ipp_tools
 namespace maps
 {
 
-TestMap::TestMap(double resolution)
+TestMap::TestMap(float resolution)
 {
     // Set the resolution
     resolution_ = resolution;
@@ -47,7 +47,7 @@ TestMap::TestMap(double resolution)
     }
 }
 
-bool TestMap::isTraversable(const Eigen::Vector2d& point)
+bool TestMap::isTraversable(const Eigen::Vector2f& point)
 {
     // Get the value for that cell
     unsigned char value = getVoxelState(point);
@@ -62,10 +62,10 @@ bool TestMap::isTraversable(const Eigen::Vector2d& point)
     }
 }
 
-bool TestMap::isPathTraversable(const Eigen::Vector2d& start, const Eigen::Vector2d& goal)
+bool TestMap::isPathTraversable(const Eigen::Vector2f& start, const Eigen::Vector2f& goal)
 {
-    Eigen::Vector2d direction = (goal - start).normalized();
-    Eigen::Vector2d point = start;
+    Eigen::Vector2f direction = (goal - start).normalized();
+    Eigen::Vector2f point = start;
     while ((point - goal).norm() > resolution_)
     {
         point += direction*resolution_;
@@ -77,7 +77,7 @@ bool TestMap::isPathTraversable(const Eigen::Vector2d& start, const Eigen::Vecto
     return true;
 }
 
-bool TestMap::exists(const Eigen::Vector2d& point)
+bool TestMap::exists(const Eigen::Vector2f& point)
 {
     // Get the value for that cell
     unsigned char value = getVoxelState(point);
@@ -92,7 +92,7 @@ bool TestMap::exists(const Eigen::Vector2d& point)
     }
 }
 
-unsigned char TestMap::getVoxelState(const Eigen::Vector2d& point)
+unsigned char TestMap::getVoxelState(const Eigen::Vector2f& point)
 {
     // Get the map point
     Eigen::Vector2i map_point;
@@ -117,7 +117,7 @@ unsigned char TestMap::getVoxelState(const Eigen::Vector2d& point)
     }
 }
 
-bool TestMap::getVoxelCenter(const Eigen::Vector2d& point, Eigen::Vector2d& voxel_center)
+bool TestMap::getVoxelCenter(const Eigen::Vector2f& point, Eigen::Vector2f& voxel_center)
 {
     // Get the map point
     Eigen::Vector2i map_point;
@@ -137,7 +137,7 @@ bool TestMap::getVoxelCenter(const Eigen::Vector2d& point, Eigen::Vector2d& voxe
 
 }
 
-void TestMap::worldToMap_(const Eigen::Vector2d& point, Eigen::Vector2i& map_point)
+void TestMap::worldToMap_(const Eigen::Vector2f& point, Eigen::Vector2i& map_point)
 {
     // Get the map point
     map_point.x() = (point.x() + map_size_/2)/resolution_;
@@ -159,7 +159,7 @@ void TestMap::printMap()
 
     // Scale the range of pixel values to match the number of characters
     const int char_count = sizeof(chars) - 1;
-    const double scale = char_count / 256.0;
+    const float scale = char_count / 256.0;
 
     // Iterate through the 2D vector and print the ASCII art
     for (int y = 0; y < grid_size_; y++) {
@@ -172,14 +172,14 @@ void TestMap::printMap()
     }
 }
 
-void TestMap::printRoute(const std::vector<Eigen::Vector2d>& route)
+void TestMap::printRoute(const std::vector<Eigen::Vector2f>& route)
 {
     // Define a set of characters to represent different intensity levels
     const char chars[] = ".%#*+=-:O";
 
     // Scale the range of pixel values to match the number of characters
     const int char_count = sizeof(chars) - 1;
-    const double scale = char_count / 256.0;
+    const float scale = char_count / 256.0;
 
     // Iterate through the 2D vector and print the ASCII art
     for (int y = 0; y < grid_size_; y++) {

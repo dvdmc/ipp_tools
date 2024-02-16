@@ -39,7 +39,7 @@ class OccupancyMap : public Map<Xn>
         virtual unsigned char getVoxelState(const Xn& point) = 0;
 
         // get voxel size
-        virtual double getVoxelSize() = 0;
+        virtual float getVoxelSize() = 0;
 
         // get the center of a voxel from input point
         virtual bool getVoxelCenter(const Xn& point, Xn& voxel_center) = 0;

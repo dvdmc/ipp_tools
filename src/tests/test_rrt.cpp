@@ -13,24 +13,24 @@ int main(int argc, char** argv)
 {
     std::cout << "Starting test" << std::endl;
     double resolution = 0.1;
-    ipp_tools::common::Limits2D limits(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(10, 10, 0));
+    ipp_tools::common::Limits2D limits(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(10, 10, 0));
     // Initialize the map
     ipp_tools::maps::TestMap map(resolution);
     std::shared_ptr<ipp_tools::maps::TestMap> map_ptr = std::make_shared<ipp_tools::maps::TestMap>(map);
     // Initialize the RRT planner
-    ipp_tools::planners::RRT<Eigen::Affine2d, Eigen::Vector2d, ipp_tools::common::Limits2D> rrt(map_ptr, limits);
+    ipp_tools::planners::RRT<Eigen::Affine2f, Eigen::Vector2f, ipp_tools::common::Limits2D> rrt(map_ptr, limits);
 
     // Set the start and goal points
-    Eigen::Affine2d start(Eigen::Translation2d(-4.5, -4.5));
-    Eigen::Affine2d goal(Eigen::Translation2d(4.5, 4.5));
+    Eigen::Affine2f start(Eigen::Translation2f(-4.5, -4.5));
+    Eigen::Affine2f goal(Eigen::Translation2f(4.5, 4.5));
 
     // Plan the route
     std::cout << "Creating plan" << std::endl;
     rrt.setup(start, goal);
 
-    std::vector<Eigen::Affine2d> route = rrt.getPath();
+    std::vector<Eigen::Affine2f> route = rrt.getPath();
     // Transform to points
-    std::vector<Eigen::Vector2d> route_points;
+    std::vector<Eigen::Vector2f> route_points;
     for (int i = 0; i < route.size(); i++)
     {
         route_points.push_back(route[i].translation());

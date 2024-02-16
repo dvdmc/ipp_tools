@@ -48,13 +48,13 @@ class AirsimPlannerBridge {
   ~AirsimPlannerBridge();
 
   bool sendPose(Pose pose);
-  bool sendPose(Eigen::Affine3d eigen_pose);
+  bool sendPose(Eigen::Affine3f eigen_pose);
 
   Pose worldPoseFromAirsim(Pose pos);
-  Eigen::Affine3d worldPoseFromAirsim(Eigen::Affine3d pos);
+  Eigen::Affine3f worldPoseFromAirsim(Eigen::Affine3f pos);
 
   Pose airsimPoseFromWorld(Pose pos);
-  Eigen::Affine3d airsimPoseFromWorld(Eigen::Affine3d pos);
+  Eigen::Affine3f airsimPoseFromWorld(Eigen::Affine3f pos);
 
  private:
   msr::airlib::MultirotorRpcLibClient client;

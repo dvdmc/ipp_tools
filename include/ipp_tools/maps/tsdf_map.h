@@ -17,7 +17,7 @@ namespace maps
  * @brief Basic TSDF map class templated to work with different configuration spaces.
 */
 template <typename Xn>
-class TSDFMap : public Map<Xn>
+class TSDFMap : public OccupancyMap<Xn>
 {
  public:
   // constructor
@@ -26,13 +26,14 @@ class TSDFMap : public Map<Xn>
   virtual ~TSDFMap() = default;
 
   // get the stored distance
-  virtual double getVoxelDistance(const Xn &point) = 0;
+  virtual float getVoxelDistance(const Xn &point) = 0;
 
   // get the stored weight
-  virtual double getVoxelWeight(const Xn &point) = 0;
+  virtual float getVoxelWeight(const Xn &point) = 0;
 
   // get the maximum allowed weight (return 0 if using uncapped weights)
-  virtual double getMaximumWeight() = 0;
+  virtual float getMaximumWeight() = 0;
+  
 };
 
 }  // end namespace maps

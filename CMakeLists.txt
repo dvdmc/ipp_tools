@@ -6,13 +6,13 @@ if(NOT DEFINED WITH_AIRSIM)
 endif()
 
 if(NOT DEFINED WITH_VOXBLOX)
-  set(WITH_VOXBLOX OFF)
+  set(WITH_VOXBLOX ON)
 endif()
 
 if(WITH_AIRSIM)
   message(STATUS "Building with AirSim")
   # set this to path to AirSim root folder if you want your catkin workspace in a custom directory
-  set(AIRSIM_ROOT /media/david/AirSim)
+  set(AIRSIM_ROOT /media/david/git/Colosseum)
   add_subdirectory("${AIRSIM_ROOT}/cmake/rpclib_wrapper" rpclib_wrapper)
   add_subdirectory("${AIRSIM_ROOT}/cmake/AirLib" AirLib)
   add_subdirectory("${AIRSIM_ROOT}/cmake/MavLinkCom" MavLinkCom)
@@ -78,6 +78,7 @@ endif()
 
 add_library(ipp_tools
 src/planners/basics/poses_file_planner.cpp
+src/value/viewpoint_evaluator.cpp
 )
 target_link_libraries(ipp_tools  
   ${catkin_LIBRARIES}

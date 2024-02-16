@@ -50,8 +50,8 @@ class RRT : public BasePlanner <Xn>{
    *
    *
    */
-  bool setup(const Xn& start, const Xn& goal, double goal_tolerance = 0.1,
-             int max_iterations = 1000, double max_distance = 0.5);
+  bool setup(const Xn& start, const Xn& goal, float goal_tolerance = 0.1,
+             int max_iterations = 1000, float max_distance = 0.5);
 
   /**
    * @brief Plan using the configuration in the param map
@@ -119,7 +119,7 @@ class RRT : public BasePlanner <Xn>{
   std::unique_ptr<common::Node<Xn>> start_, end_;
   std::vector<std::unique_ptr<common::Node<Xn>>> tree_;
   L limits_;
-  double goal_tolerance_, max_distance_;
+  float goal_tolerance_, max_distance_;
   int max_iterations_;
 };
 
@@ -130,8 +130,8 @@ RRT<Xn, Mn, L>::RRT(std::shared_ptr<maps::Map<Mn>> map, const L& limits)
 }
 
 template <typename Xn, typename Mn, typename L>
-bool RRT<Xn, Mn, L>::setup(const Xn& start, const Xn& goal, double goal_tolerance,
-                       int max_iterations, double max_distance) {
+bool RRT<Xn, Mn, L>::setup(const Xn& start, const Xn& goal, float goal_tolerance,
+                       int max_iterations, float max_distance) {
   this->path_.clear();  // Clear path
   start_ = std::make_unique<common::Node<Xn>>(start, 0, 0, 0, 0, nullptr);
   // This is a temporal special case
@@ -220,9 +220,9 @@ const common::Node<Xn>* RRT<Xn, Mn, L>::nearest_(const Xn& sample) {
   // Find the nearest node by iterating over the tree and finding the
   // node with the minimum distance to the sample
   common::Node<Xn>* nearest;
-  double min_distance = std::numeric_limits<double>::max();
+  float min_distance = std::numeric_limits<float>::max();
   for (auto& node : tree_) {
-    double distance = (node->x.translation() - sample.translation()).norm();
+    float distance = (node->x.translation() - sample.translation()).norm();
     if (distance < min_distance) {
       min_distance = distance;
       nearest = node.get();
@@ -250,10 +250,10 @@ void RRT<Xn, Mn, L>::addNode_(const Xn& sample, const common::Node<Xn>* nearest)
   }
 
   // Create the new node
-  double v = 0;  // Default in basic RRT
-  double g = nearest->g +
+  float v = 0;  // Default in basic RRT
+  float g = nearest->g +
              (new_node_state.translation() - nearest->x.translation()).norm();
-  double h = (new_node_state.translation() - end_->x.translation()).norm();
+  float h = (new_node_state.translation() - end_->x.translation()).norm();
   int id = tree_.size();
 
   std::unique_ptr<common::Node<Xn>> new_node =

@@ -1,23 +1,67 @@
 #include <ipp_tools/value/viewpoint_evaluator.hpp>
+#include <iostream>
 
 namespace ipp_tools {
 namespace value {
 
 ViewpointEvaluator::ViewpointEvaluator(common::CameraData _camera_data)
-    : camera_data_(_camera_data) {}
+{
+    camera_data_ = std::make_unique<common::CameraData>(_camera_data);
+}
 
 // TODO: All of this can be done in vectorized form
-
 bool ViewpointEvaluator::isPointVisible(const Eigen::Vector3f &point,
                                         const Eigen::Affine3f &camera) {
     // Transform point to camera frame
     Eigen::Vector3f point_camera = camera.inverse() * point;
 
     // Check if point is in front of the camera and inside the frustum
-    camera_data_.isInsideFrustum(point_camera);
-
-    return true;
+    return camera_data_->isInsideFrustum(point_camera);
 }
+
+void ViewpointEvaluator::getBoundingBoxFrustum(const Eigen::Affine3f &camera, Eigen::Vector3f &min, Eigen::Vector3f &max)
+        {
+            // Get frustum corners at 5m
+            Eigen::Vector3f tl_far = camera_data_->tl * camera_data_->max_distance / camera_data_->near;
+            Eigen::Vector3f tr_far = camera_data_->tr * camera_data_->max_distance / camera_data_->near;
+            Eigen::Vector3f bl_far = camera_data_->bl * camera_data_->max_distance / camera_data_->near;
+            Eigen::Vector3f br_far = camera_data_->br * camera_data_->max_distance / camera_data_->near;
+            // Displace near corners y and z to get the bounding box
+            Eigen::Vector3f tl_near = tl_far;
+            tl_near(0) = camera_data_->near;
+            Eigen::Vector3f tr_near = tr_far;
+            tr_near(0) = camera_data_->near;
+            Eigen::Vector3f bl_near = bl_far;
+            bl_near(0) = camera_data_->near;
+            Eigen::Vector3f br_near = br_far;
+            br_near(0) = camera_data_->near;
+            // Transform frustum
+            tl_far = camera * tl_far;
+            tr_far = camera * tr_far;
+            bl_far = camera * bl_far;
+            br_far = camera * br_far;
+            tl_near = camera * tl_near;
+            tr_near = camera * tr_near;
+            bl_near = camera * bl_near;
+            br_near = camera * br_near;
+            // Get min and max
+            min = tl_far;
+            max = tl_far;
+            min = min.cwiseMin(tr_far);
+            max = max.cwiseMax(tr_far);
+            min = min.cwiseMin(bl_far);
+            max = max.cwiseMax(bl_far);
+            min = min.cwiseMin(br_far);
+            max = max.cwiseMax(br_far);
+            min = min.cwiseMin(tl_near);
+            max = max.cwiseMax(tl_near);
+            min = min.cwiseMin(tr_near);
+            max = max.cwiseMax(tr_near);
+            min = min.cwiseMin(bl_near);
+            max = max.cwiseMax(bl_near);
+            min = min.cwiseMin(br_near);
+            max = max.cwiseMax(br_near);
+        }
 
 void ViewpointEvaluator::visbilityCulling(
     const std::vector<Eigen::Vector3f> &points, const Eigen::Affine3f &camera,
@@ -113,6 +157,35 @@ float ViewpointEvaluator::evaluateViewpointVisibleFrontiers(
     const Eigen::Affine3f &camera, const float &point_size,
     const std::vector<Eigen::Vector3f> &frontier_voxels,
     const std::vector<Eigen::Vector3f> &surface_voxels) {
+
+    // Evaluate which voxels are visible from the camera. Surface and frontier
+    // voxels are evaluated together. Frontiers are placed first in the vector
+    // for later viewpoint gain computation
+    std::vector<bool> v_is_point_visible(
+        frontier_voxels.size() + surface_voxels.size(), false);
+    std::vector<Eigen::Vector3f> all_voxels_positions;
+    all_voxels_positions.insert(all_voxels_positions.end(),
+                                frontier_voxels.begin(), frontier_voxels.end());
+    all_voxels_positions.insert(all_voxels_positions.end(),
+                                surface_voxels.begin(), surface_voxels.end());
+    visiblityAndOcclusionCulling(all_voxels_positions, point_size, camera,
+                                 v_is_point_visible);
+
+    // Compute the value as the number of visible *frontier voxels* (ignore surface voxels)
+    int visible_frontier_voxels = 0;
+    for (int i = 0; i < frontier_voxels.size(); i++) {
+        if (v_is_point_visible[i]) {
+            visible_frontier_voxels++;
+        }
+    }
+    return visible_frontier_voxels;
+}
+
+float ViewpointEvaluator::evaluateViewpointVisibleExploreExploit(
+    const Eigen::Affine3f &camera, const float &point_size,
+    const std::vector<Eigen::Vector3f> &frontier_voxels,
+    const std::vector<Eigen::Vector3f> &surface_voxels) {
+        
     // Evaluate which voxels are visible from the camera. Surface and frontier
     // voxels are evaluated together
     std::vector<bool> v_is_point_visible(

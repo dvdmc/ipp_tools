@@ -26,39 +26,39 @@ namespace maps
 /**
  * @brief Basic Map class templated to work with different configuration spaces.
 */
-class TestMap : public OccupancyMap<Eigen::Vector2d>
+class TestMap : public OccupancyMap<Eigen::Vector2f>
 {
     public:
-        TestMap(double resolution = 0.1);
+        TestMap(float resolution = 0.1);
 
         // get occupancy
-        unsigned char getVoxelState(const Eigen::Vector2d& point);
+        unsigned char getVoxelState(const Eigen::Vector2f& point);
 
         // get voxel size
-        inline double getVoxelSize() { return resolution_; }
+        inline float getVoxelSize() { return resolution_; }
 
         // get the center of a voxel from input point
-        bool getVoxelCenter(const Eigen::Vector2d& point, Eigen::Vector2d& voxel_center);
+        bool getVoxelCenter(const Eigen::Vector2f& point, Eigen::Vector2f& voxel_center);
 
-        bool isTraversable(const Eigen::Vector2d& point);
+        bool isTraversable(const Eigen::Vector2f& point);
 
-        bool isPathTraversable(const Eigen::Vector2d& start, const Eigen::Vector2d& goal);
+        bool isPathTraversable(const Eigen::Vector2f& start, const Eigen::Vector2f& goal);
         
-        bool exists(const Eigen::Vector2d& point);
+        bool exists(const Eigen::Vector2f& point);
 
         void printMap();
 
-        void printRoute(const std::vector<Eigen::Vector2d>& route);
+        void printRoute(const std::vector<Eigen::Vector2f>& route);
 
     private:
-        void worldToMap_(const Eigen::Vector2d& point, Eigen::Vector2i& map_point);
+        void worldToMap_(const Eigen::Vector2f& point, Eigen::Vector2i& map_point);
 
         // The actual map structure. It is 10x10 meters with a circle in the middle
         // with radius 1 meter
-        double map_size_ = 10; //m
+        float map_size_ = 10; //m
         int grid_size_;
-        double resolution_;
-        double map_center_;
+        float resolution_;
+        float map_center_;
         int grid_center_;
         float circle_size_ = 1; //m
         int circle_radius_;

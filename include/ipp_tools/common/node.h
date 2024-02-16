@@ -42,13 +42,13 @@ struct Node
    * @param _id  node's id
    * @param _p   parent's reference
    */
-    Node(Xn _x, double _v, double _g, double _h, int _id, const Node<Xn>* _p)
+    Node(Xn _x, float _v, float _g, float _h, int _id, const Node<Xn>* _p)
         : x(_x), v(_v), g(_g), h(_h), id(_id), parent(_p) {}
 
     Xn x;               // configuration x in generic space
-    double v;           // generic value of the node
-    double g;           // g value, cost to get to this node
-    double h;           // h value, heuritic cost of this node
+    float v;           // generic value of the node
+    float g;           // g value, cost to get to this node
+    float h;           // h value, heuritic cost of this node
     int id;             // node's id
     const Node<Xn>* parent;   // parent's reference
 

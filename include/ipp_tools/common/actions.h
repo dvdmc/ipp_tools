@@ -33,10 +33,10 @@ namespace common
 */
 template <int N>
 struct ActionSpace {
-    ActionSpace(std::vector<std::string> names, Eigen::Matrix<double, N, 1> min, Eigen::Matrix<double, N, 1> max) : min(min), max(max) {}
+    ActionSpace(std::vector<std::string> names, Eigen::Matrix<float, N, 1> min, Eigen::Matrix<float, N, 1> max) : min(min), max(max) {}
     std::vector<std::string> names;
-    Eigen::Matrix<double, N, 1> min;
-    Eigen::Matrix<double, N, 1> max;
+    Eigen::Matrix<float, N, 1> min;
+    Eigen::Matrix<float, N, 1> max;
 
     /**
      * @brief Sample equispaced actions from the action space
@@ -44,19 +44,19 @@ struct ActionSpace {
      * @param n Number of samples per dimension
      * @return A vector of actions
     */
-    std::vector<Eigen::Matrix<double, N, 1>> sample(int n) {
-        std::vector<Eigen::Matrix<double, N, 1>> result;
+    std::vector<Eigen::Matrix<float, N, 1>> sample(int n) {
+        std::vector<Eigen::Matrix<float, N, 1>> result;
 
         // Calculate the total number of samples
         int totalSamples = std::pow(n, N);
 
         for (int i = 0; i < totalSamples; ++i) {
-            Eigen::Matrix<double, N, 1> sample;
+            Eigen::Matrix<float, N, 1> sample;
             int index = i;
 
             for (int j = 0; j < N; ++j) {
                 // Calculate equispaced value for each dimension
-                double step = (max(j) - min(j)) / (n - 1);
+                float step = (max(j) - min(j)) / (n - 1);
                 sample(j) = min(j) + (index % n) * step;
 
                 // Move to the next dimension
@@ -77,9 +77,9 @@ struct ActionSpace {
      * @param v_n Number of samples per dimension
      * @return A vector of actions
      */
-    std::vector<Eigen::Matrix<double, N, 1>> sample(const std::vector<int>& v_n) {
+    std::vector<Eigen::Matrix<float, N, 1>> sample(const std::vector<int>& v_n) {
         assert(v_n.size() == N);
-        std::vector<Eigen::Matrix<double, N, 1>> result;
+        std::vector<Eigen::Matrix<float, N, 1>> result;
         
         // Calculate the total number of samples
         int totalSamples = 1;
@@ -88,7 +88,7 @@ struct ActionSpace {
         }
 
         for (int i = 0; i < totalSamples; ++i) {
-        Eigen::Matrix<double, N, 1> sample;
+        Eigen::Matrix<float, N, 1> sample;
         int index = i;
 
         for (int j = 0; j < N; ++j) {
@@ -98,7 +98,7 @@ struct ActionSpace {
                 continue;
             } else
             {
-            double step = (max(j) - min(j)) / (count - 1);
+            float step = (max(j) - min(j)) / (count - 1);
             sample(j) = min(j) + float(index % count) * step;
             }
 
@@ -115,11 +115,11 @@ struct ActionSpace {
      * @param n Number of samples
      * @return A vector of actions
     */
-    std::vector<Eigen::Matrix<double, N, 1>> sample_random(int n) {
-        std::vector<Eigen::Matrix<double, N, 1>> actions;
-        Eigen::Matrix<double, N, 1> action;
+    std::vector<Eigen::Matrix<float, N, 1>> sample_random(int n) {
+        std::vector<Eigen::Matrix<float, N, 1>> actions;
+        Eigen::Matrix<float, N, 1> action;
         for (int i = 0; i < n; i++) {
-            action = min + Eigen::Matrix<double, N, 1>::Random().cwiseAbs().cwiseProduct(max - min);
+            action = min + Eigen::Matrix<float, N, 1>::Random().cwiseAbs().cwiseProduct(max - min);
             actions.push_back(action);
         }
         return actions;

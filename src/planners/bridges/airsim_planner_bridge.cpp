@@ -15,9 +15,9 @@ bool AirsimPlannerBridge::sendPose(Pose pose) {
   return true;
 }
 
-bool AirsimPlannerBridge::sendPose(Eigen::Affine3d eigen_pose) {
+bool AirsimPlannerBridge::sendPose(Eigen::Affine3f eigen_pose) {
 
-  Eigen::Quaterniond rotation(eigen_pose.linear());
+  Eigen::Quaternionf rotation(eigen_pose.linear());
 
   Pose pose = Pose(msr::airlib::Vector3r(eigen_pose.translation().x(),
                                          eigen_pose.translation().y(),
@@ -45,17 +45,17 @@ AirsimPlannerBridge::Pose AirsimPlannerBridge::worldPoseFromAirsim(AirsimPlanner
   return pos;
 }
 
-Eigen::Affine3d AirsimPlannerBridge::worldPoseFromAirsim(Eigen::Affine3d pos) {
-  Eigen::Affine3d new_pos;
+Eigen::Affine3f AirsimPlannerBridge::worldPoseFromAirsim(Eigen::Affine3f pos) {
+  Eigen::Affine3f new_pos;
 
-  Eigen::Vector3d translation = Eigen::Vector3d(
+  Eigen::Vector3f translation = Eigen::Vector3f(
       pos.translation().x(), -pos.translation().y(), -pos.translation().z());
   new_pos.translation() = translation;
 
-  Eigen::Quaterniond rotation(pos.rotation());
-  Eigen::Quaterniond new_rotation(rotation.w(), rotation.x(),
+  Eigen::Quaternionf rotation(pos.linear());
+  Eigen::Quaternionf new_rotation(rotation.w(), rotation.x(),
                          -rotation.y(), -rotation.z());
-  new_pos.rotate(new_rotation);
+  new_pos = new_pos.rotate(new_rotation);
 
   return new_pos;
 }
@@ -68,22 +68,21 @@ AirsimPlannerBridge::Pose AirsimPlannerBridge::airsimPoseFromWorld(AirsimPlanner
   pos.orientation.x() = pos.orientation.x();
   pos.orientation.y() = -pos.orientation.y();
   pos.orientation.z() = -pos.orientation.z();
-
   return pos;
 }
 
-Eigen::Affine3d AirsimPlannerBridge::airsimPoseFromWorld(Eigen::Affine3d pos) {
+Eigen::Affine3f AirsimPlannerBridge::airsimPoseFromWorld(Eigen::Affine3f pos) {
   
-  Eigen::Affine3d new_pos;
+  Eigen::Affine3f new_pos(Eigen::Affine3f::Identity());
 
-  Eigen::Vector3d translation = Eigen::Vector3d(
+  Eigen::Vector3f translation = Eigen::Vector3f(
       pos.translation().x(), -pos.translation().y(), -pos.translation().z());
-  new_pos.translation() = translation;
+  new_pos.translate(translation);
 
-  Eigen::Quaterniond rotation(pos.rotation());
-  Eigen::Quaterniond new_rotation(rotation.w(), rotation.x(),
+  Eigen::Quaternionf rotation(pos.linear());
+  Eigen::Quaternionf new_rotation(rotation.w(), rotation.x(),
                          -rotation.y(), -rotation.z());
-  new_pos.rotate(new_rotation);
+  new_pos = new_pos.rotate(new_rotation);
 
   return new_pos;
 }

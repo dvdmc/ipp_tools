@@ -37,7 +37,7 @@ class RandomPoseGenerator;
  * @brief Random pose generator for 2D configuration spaces
 */
 template <>
-class RandomPoseGenerator<Eigen::Affine2d>
+class RandomPoseGenerator<Eigen::Affine2f>
 {
 public:
     RandomPoseGenerator(const common::Limits2D &limits, unsigned int seed = 0)
@@ -48,25 +48,25 @@ public:
 
     ~RandomPoseGenerator() = default;
 
-    void getPose(Eigen::Affine2d& pose)
+    void getPose(Eigen::Affine2f& pose)
     {
         pose.translation().x() = x_distribution_(generator_);
         pose.translation().y() = y_distribution_(generator_);
-        pose.linear() = Eigen::Rotation2Dd(yaw_distribution_(generator_)).toRotationMatrix();
+        pose.linear() = Eigen::Rotation2Df(yaw_distribution_(generator_)).toRotationMatrix();
     }
 
 private:
     std::mt19937 generator_;
-    std::uniform_real_distribution<double> x_distribution_;
-    std::uniform_real_distribution<double> y_distribution_;
-    std::uniform_real_distribution<double> yaw_distribution_;
+    std::uniform_real_distribution<float> x_distribution_;
+    std::uniform_real_distribution<float> y_distribution_;
+    std::uniform_real_distribution<float> yaw_distribution_;
 };
 
 /**
  * @brief Random pose generator for 3D configuration spaces
 */
 template <>
-class RandomPoseGenerator<Eigen::Affine3d>
+class RandomPoseGenerator<Eigen::Affine3f>
 {
 public:
     RandomPoseGenerator(const common::Limits3D &limits, unsigned int seed = 0)
@@ -80,25 +80,25 @@ public:
 
     ~RandomPoseGenerator() = default;
 
-    void getPose(Eigen::Affine3d& pose)
+    void getPose(Eigen::Affine3f& pose)
     {
         pose.translation().x() = x_distribution_(generator_);
         pose.translation().y() = y_distribution_(generator_);
         pose.translation().z() = z_distribution_(generator_);
-        pose.linear() = (Eigen::AngleAxisd(roll_distribution_(generator_), Eigen::Vector3d::UnitX()) *
-                         Eigen::AngleAxisd(pitch_distribution_(generator_), Eigen::Vector3d::UnitY()) *
-                         Eigen::AngleAxisd(yaw_distribution_(generator_), Eigen::Vector3d::UnitZ()))
+        pose.linear() = (Eigen::AngleAxisf(roll_distribution_(generator_), Eigen::Vector3f::UnitX()) *
+                         Eigen::AngleAxisf(pitch_distribution_(generator_), Eigen::Vector3f::UnitY()) *
+                         Eigen::AngleAxisf(yaw_distribution_(generator_), Eigen::Vector3f::UnitZ()))
                             .toRotationMatrix();
     }
 
 private:
     std::mt19937 generator_;
-    std::uniform_real_distribution<double> x_distribution_;
-    std::uniform_real_distribution<double> y_distribution_;
-    std::uniform_real_distribution<double> z_distribution_;
-    std::uniform_real_distribution<double> roll_distribution_;
-    std::uniform_real_distribution<double> pitch_distribution_;
-    std::uniform_real_distribution<double> yaw_distribution_;
+    std::uniform_real_distribution<float> x_distribution_;
+    std::uniform_real_distribution<float> y_distribution_;
+    std::uniform_real_distribution<float> z_distribution_;
+    std::uniform_real_distribution<float> roll_distribution_;
+    std::uniform_real_distribution<float> pitch_distribution_;
+    std::uniform_real_distribution<float> yaw_distribution_;
 };
 
 } // namespace samplers
