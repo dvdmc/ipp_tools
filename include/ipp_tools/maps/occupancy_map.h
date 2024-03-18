@@ -29,11 +29,14 @@ class OccupancyMap : public Map<Xn>
     public:
         // constructor
         OccupancyMap() = default;
+
+        virtual ~OccupancyMap() = default;
     
         // states
         const static unsigned char OCCUPIED = 0;  // NOLINT
         const static unsigned char FREE = 1;      // NOLINT
         const static unsigned char UNKNOWN = 2;   // NOLINT
+        const static unsigned char INVALID = 3;   // NOLINT
 
         // get occupancy
         virtual unsigned char getVoxelState(const Xn& point) = 0;

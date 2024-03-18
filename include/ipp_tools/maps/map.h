@@ -25,6 +25,11 @@ template <typename Xn>
 class Map
 {
     public:
+        // constructor
+        Map() = default;
+
+        virtual ~Map() = default;
+        
         virtual bool isTraversable(const Xn &x) = 0;
         virtual bool isPathTraversable(const Xn &start, const Xn &goal) = 0;
         virtual bool exists(const Xn &x) = 0;

@@ -41,6 +41,8 @@ class VoxbloxMap : public TSDFMap<Eigen::Vector3f> {
   // get occupancy // TODO: Check if this could be abstract
   virtual unsigned char getVoxelState(const Eigen::Vector3f &point) override;
 
+  unsigned char getVoxelState(const voxblox::TsdfVoxel &voxel);
+  
   // get voxel size
   virtual float getVoxelSize() override;
 
@@ -131,7 +133,7 @@ class VoxbloxMap : public TSDFMap<Eigen::Vector3f> {
     c_maximum_weight_ = max_weigth;
   }
 
-  voxblox::LongIndexSet frontier_voxels;  
+  voxblox::LongIndexSet frontier_voxels, free_voxels, occupied_voxels, invalid_voxels; 
   std::vector<Eigen::Vector3f> getFrontierVoxelsPositions();
 
   // accessor to the server for specialized planners

@@ -13,12 +13,12 @@ int main(int argc, char** argv)
 {
     std::cout << "Starting test" << std::endl;
     double resolution = 0.1;
-    ipp_tools::common::Limits2D limits(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(10, 10, 0));
+    ipp_tools::common::Limits<3> limits(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(10, 10, 0));
     // Initialize the map
     ipp_tools::maps::TestMap map(resolution);
     std::shared_ptr<ipp_tools::maps::TestMap> map_ptr = std::make_shared<ipp_tools::maps::TestMap>(map);
     // Initialize the RRT planner
-    ipp_tools::planners::RRT<Eigen::Affine2f, Eigen::Vector2f, ipp_tools::common::Limits2D> rrt(map_ptr, limits);
+    ipp_tools::planners::RRT<Eigen::Affine2f, Eigen::Vector2f, ipp_tools::common::Limits<3>> rrt(map_ptr, limits);
 
     // Set the start and goal points
     Eigen::Affine2f start(Eigen::Translation2f(-4.5, -4.5));

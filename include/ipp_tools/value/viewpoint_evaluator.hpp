@@ -132,7 +132,7 @@ class ViewpointEvaluator {
         const std::vector<Eigen::Vector3f> &frontier_voxels,
         const std::vector<Eigen::Vector3f> &surface_voxels,
         SemanticValueGainEstimation *semantic_value_gain_estimation,
-        SemanticEstimationModel* semantic_estimation_model);
+        SemanticEstimationModel *semantic_estimation_model);
 
    private:
     std::unique_ptr<common::CameraData> camera_data_;

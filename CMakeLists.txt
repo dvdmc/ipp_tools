@@ -81,6 +81,7 @@ endif()
 
 add_library(ipp_tools
 src/planners/basics/poses_file_planner.cpp
+src/planners/basics/random_planners.cpp
 src/value/viewpoint_evaluator.cpp
 src/value/semantic_value_gain_estimation.cpp
 )

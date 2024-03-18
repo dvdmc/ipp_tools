@@ -210,15 +210,15 @@ float ViewpointEvaluator::evaluateViewpointVisibleExploreExploit(
 
     // Compute the semantic value gain
     float semantic_value_gain = 0.0;
-    for (int i = 0; i < frontier_voxels.size(); i++) {
+    for (int i = frontier_voxels.size(); i < all_voxels_positions.size(); i++) {
         if (v_is_point_visible[i]) {
             semantic_value_gain += semantic_value_gain_estimation->evaluateInformationGain(
-                camera, frontier_voxels[i], semantic_estimation_model);
+                camera, all_voxels_positions[i], semantic_estimation_model);
         }
     }
 
     // Compute the value as the number of visible *surface voxels* (ignore frontier voxels)
-    return visible_frontier_voxels;
+    return visible_frontier_voxels + 100 * semantic_value_gain;
 }
 
 }  // namespace value

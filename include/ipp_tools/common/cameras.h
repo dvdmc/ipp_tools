@@ -64,16 +64,16 @@ struct CameraData {
      * @param p1 Tangential distortion coefficient
      * @param p2 Tangential distortion coefficient
      * @param k4 Radial distortion coefficient
-     * 
+     *
      * NOTE: If you want to compute f_h and f_v from the fov, you can use:
      * aspect_ratio = (float)width / (float)height;
      * f_h = c_h / tan(fov_h / 2.0);
      * f_v = f_h / aspect_ratio;
-    */
+     */
     CameraData(int width, int height, float f_h, float f_v, float c_h,
-               float c_v, float near = 0.001, float far = 1000,
-               float max_distance = 10.0, float k1 = 0, float k2 = 0,
-               float k3 = 0, float p1 = 0, float p2 = 0, float k4 = 0)
+               float c_v, float max_distance = 10.0, float near = 0.001,
+               float far = 1000, float k1 = 0, float k2 = 0, float k3 = 0,
+               float p1 = 0, float p2 = 0, float k4 = 0)
         : width(width),
           height(height),
           f_h(f_h),
@@ -100,7 +100,7 @@ struct CameraData {
         bl = Eigen::Vector3f(near, h_width, -h_height);
         br = Eigen::Vector3f(near, -h_width, -h_height);
 
-        // Frustum plane normals
+        // Frustum plane normals (pointing inwards)
         n_top = tl.cross(tr).normalized();
         n_right = tr.cross(br).normalized();
         n_bottom = br.cross(bl).normalized();
@@ -115,8 +115,7 @@ struct CameraData {
     bool isInsideFrustum(const Eigen::Vector3f& point) const {
         if (point(0) < 0 || point(0) > max_distance || point.dot(n_top) < 0 ||
             point.dot(n_right) < 0 || point.dot(n_bottom) < 0 ||
-            point.dot(n_left) < 0)
-        {
+            point.dot(n_left) < 0) {
             return false;
         }
 
@@ -128,7 +127,7 @@ struct CameraData {
                            Eigen::Vector3f& bl_near, Eigen::Vector3f& br_near,
                            Eigen::Vector3f& tl_far, Eigen::Vector3f& tr_far,
                            Eigen::Vector3f& bl_far, Eigen::Vector3f& br_far) {
-        // Get frustum corners at 5m
+        // Get frustum corners at max_distance
         tl_far = tl * max_distance / near;
         tr_far = tr * max_distance / near;
         bl_far = bl * max_distance / near;
@@ -180,7 +179,6 @@ struct CameraData {
 
         return os;
     }
-    
 };
 
 }  // namespace common

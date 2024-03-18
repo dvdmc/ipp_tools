@@ -22,19 +22,18 @@ VoxbloxMap::VoxbloxMap(voxblox::EsdfServer *esdf_server)
 
 bool VoxbloxMap::isTraversable(const Eigen::Vector3f &position) {
     double distance = 0.0;
-    if (esdf_server_->getEsdfMapPtr()->getDistanceAtPosition(position.cast<double>(),
-                                                             &distance)) {
+    if (esdf_server_->getEsdfMapPtr()->getDistanceAtPosition(
+            position.cast<double>(), &distance)) {
         // This means the voxel is observed
         return (distance > p_collision_radius_);
-    }
-    else {
+    } else {
         // std::cout << "POINT WAS NOT OBSERVED" << std::endl;
     }
     return false;
 }
 
 bool VoxbloxMap::isPathTraversable(const Eigen::Vector3f &start,
-                                  const Eigen::Vector3f &end) {
+                                   const Eigen::Vector3f &end) {
     // Line between start and end
     Eigen::Vector3f direction = end - start;
     float distance = direction.norm();
@@ -60,11 +59,15 @@ bool VoxbloxMap::exists(const Eigen::Vector3f &point) {
 
 unsigned char VoxbloxMap::getVoxelState(const Eigen::Vector3f &point) {
     double distance = 0.0;
-    if (esdf_server_->getEsdfMapPtr()->getDistanceAtPosition(point.cast<double>(),
-                                                             &distance)) {
+    if (esdf_server_->getEsdfMapPtr()->getDistanceAtPosition(
+            point.cast<double>(), &distance)) {
         // This means the voxel is observed
         if (distance < c_voxel_size_) {
-            return VoxbloxMap::OCCUPIED;
+            if (distance < -c_voxel_size_) {
+                return VoxbloxMap::INVALID;
+            } else {
+                return VoxbloxMap::OCCUPIED;
+            }
         } else {
             return VoxbloxMap::FREE;
         }
@@ -73,22 +76,38 @@ unsigned char VoxbloxMap::getVoxelState(const Eigen::Vector3f &point) {
     }
 }
 
+unsigned char VoxbloxMap::getVoxelState(const voxblox::TsdfVoxel &voxel) {
+    if (voxel.weight < 1e-6) {
+        return VoxbloxMap::UNKNOWN;
+    } else if (voxel.distance <= c_voxel_size_/1.2) {
+        if (voxel.distance <= -c_voxel_size_/1.2) {
+            return VoxbloxMap::INVALID;
+        } else {
+            return VoxbloxMap::OCCUPIED;
+        }
+    } else {
+        return VoxbloxMap::FREE;
+    }
+}
+
 float VoxbloxMap::getVoxelSize() { return c_voxel_size_; }
 
 // get the center of a voxel from input point
 bool VoxbloxMap::getVoxelCenter(const Eigen::Vector3f &point,
-                                 Eigen::Vector3f &voxel_center) {
+                                Eigen::Vector3f &voxel_center) {
     voxblox::BlockIndex block_id =
         esdf_server_->getEsdfMapPtr()
             ->getEsdfLayerPtr()
             ->computeBlockIndexFromCoordinates(
                 point.cast<voxblox::FloatingPoint>());
-    voxel_center = voxblox::getOriginPointFromGridIndex(block_id, c_block_size_);
+    voxel_center =
+        voxblox::getOriginPointFromGridIndex(block_id, c_block_size_);
     voxblox::VoxelIndex voxel_id =
         voxblox::getGridIndexFromPoint<voxblox::VoxelIndex>(
             (point - voxel_center).cast<voxblox::FloatingPoint>(),
             1.0 / c_voxel_size_);
-    voxel_center += voxblox::getCenterPointFromGridIndex(voxel_id, c_voxel_size_);
+    voxel_center +=
+        voxblox::getCenterPointFromGridIndex(voxel_id, c_voxel_size_);
     return true;
 }
 
@@ -213,7 +232,8 @@ void VoxbloxMap::getOccupiedPositionsBoundingBox(
     }
 }
 
-Eigen::Vector3f VoxbloxMap::getNormalAtPosition(const Eigen::Vector3f &voxel_position) {
+Eigen::Vector3f VoxbloxMap::getNormalAtPosition(
+    const Eigen::Vector3f &voxel_position) {
     Eigen::Vector3d normal = Eigen::Vector3d::Zero();
     double dist = 0.0;
     if (getESDFServer().getEsdfMapPtr()->getDistanceAndGradientAtPosition(

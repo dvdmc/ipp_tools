@@ -9,6 +9,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>semantic_mapping</depend>
+  <depend>semantic_mapping_ros</depend>
   <depend>voxblox</depend>
   <depend>voxblox_ros</depend>
 
