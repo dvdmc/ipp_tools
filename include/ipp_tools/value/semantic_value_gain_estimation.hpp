@@ -115,7 +115,7 @@ class SemanticValueGainEstimation {
      */
     float evaluateInformationGain(const Eigen::Affine3f &camera,
                                   const Eigen::Vector3f &voxel_position,
-                                  SemanticEstimationModel *model, bool skip_other_class=false) const;
+                                  SemanticEstimationModel *model, bool skip_other_class=true) const;
 
    private:
     std::shared_ptr<semantic_mapping::VoxelHashMap> voxel_hash_map_;

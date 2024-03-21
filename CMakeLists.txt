@@ -9,6 +9,15 @@ if(NOT DEFINED WITH_VOXBLOX)
   set(WITH_VOXBLOX ON)
 endif()
 
+if(NOT DEFINED WITH_ROS)
+  set(WITH_ROS ON)
+endif()
+
+# IF WITH_VOXBLOX, we need WITH_ROS. Otherwise throw an error
+if(WITH_VOXBLOX AND NOT WITH_ROS)
+  message(FATAL_ERROR "WITH_VOXBLOX requires WITH_ROS")
+endif()
+
 if(WITH_AIRSIM)
   message(STATUS "Building with AirSim")
   # set this to path to AirSim root folder if you want your catkin workspace in a custom directory
@@ -35,8 +44,26 @@ find_package(catkin REQUIRED COMPONENTS
   semantic_mapping
 )
 
+if(WITH_ROS)
+  find_package(catkin REQUIRED COMPONENTS
+    roscpp
+    std_msgs
+    sensor_msgs
+    geometry_msgs
+    tf
+    tf_conversions
+    semantic_mapping
+  )
+endif()
+
 if(WITH_VOXBLOX)
   find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  tf
+  tf_conversions
   semantic_mapping
   voxblox
   voxblox_ros
@@ -48,6 +75,9 @@ endif()
 set(CATKIN_PROJECT_LIBRARIES ipp_tools) # Core library
 if(WITH_AIRSIM)
   set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_airsim) # AirSim bridge
+endif()
+if(WITH_ROS)
+  set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_ros) # ROS bridge
 endif()
 if(WITH_VOXBLOX)
   set(CATKIN_PROJECT_LIBRARIES ${CATKIN_PROJECT_LIBRARIES} ipp_tools_voxblox) # Voxblox map
@@ -74,8 +104,6 @@ include_directories(
   ${RPC_LIB_INCLUDES}
   ${AIRSIM_ROOT}/MavLinkCom/include
   ${AIRSIM_ROOT}/MavLinkCom/common_utils
-  # Set because Boost is an internal dependency, not transitive.
-  ${Boost_INCLUDE_DIRS}
 )
 endif()
 
@@ -89,6 +117,16 @@ target_link_libraries(ipp_tools
   ${catkin_LIBRARIES}
   Eigen3::Eigen
 )
+
+if(WITH_ROS)
+add_library(ipp_tools_ros
+  src/planners/bridges/move_base_planner_bridge.cpp
+)
+target_link_libraries(ipp_tools_ros  
+  ${catkin_LIBRARIES}
+  Eigen3::Eigen
+)
+endif()
 
 if(WITH_AIRSIM)
 add_library(ipp_tools_airsim

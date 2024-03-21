@@ -17,6 +17,8 @@ bool AirsimPlannerBridge::sendPose(Pose pose) {
 
 bool AirsimPlannerBridge::sendPose(Eigen::Affine3f eigen_pose) {
 
+  current_goal_ = eigen_pose;
+
   Eigen::Quaternionf rotation(eigen_pose.linear());
 
   Pose pose = Pose(msr::airlib::Vector3r(eigen_pose.translation().x(),
@@ -85,6 +87,21 @@ Eigen::Affine3f AirsimPlannerBridge::airsimPoseFromWorld(Eigen::Affine3f pos) {
   new_pos = new_pos.rotate(new_rotation);
 
   return new_pos;
+}
+
+bool AirsimPlannerBridge::goalReached(Eigen::Affine3f current_pose) {
+  float dist = (current_goal_.translation() - current_pose.translation()).norm();
+  float angle = (current_goal_.linear() * current_pose.linear().inverse()).trace();
+
+  return dist < dist_threshold_ && angle > angle_threshold_;
+}
+
+bool AirsimPlannerBridge::isGoalReachible(Eigen::Affine3f current_pose, Eigen::Affine3f goal_pose) {
+  return true;
+}
+
+BridgeStatus AirsimPlannerBridge::getStatus() {
+  return BridgeStatus::IDLE;
 }
 
 }  // namespace bridges

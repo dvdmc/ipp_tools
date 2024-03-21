@@ -16,6 +16,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <Eigen/Dense>
 
 #include "common/ClockFactory.hpp"
 #include "common/Common.hpp"
@@ -33,11 +34,13 @@ STRICT_MODE_OFF
 #include "rpc/rpc_error.h"
 STRICT_MODE_ON
 
+#include <ipp_tools/planners/bridges/base_planner_bridge.h>
+
 namespace ipp_tools {
 namespace planners {
 namespace bridges {
 
-class AirsimPlannerBridge {
+class AirsimPlannerBridge : public BasePlannerBridge {
  private:
   typedef common_utils::Utils Utils;
   typedef msr::airlib::VectorMath VectorMath;
@@ -48,7 +51,7 @@ class AirsimPlannerBridge {
   ~AirsimPlannerBridge();
 
   bool sendPose(Pose pose);
-  bool sendPose(Eigen::Affine3f eigen_pose);
+  bool sendPose(Eigen::Affine3f eigen_pose) override;
 
   Pose worldPoseFromAirsim(Pose pos);
   Eigen::Affine3f worldPoseFromAirsim(Eigen::Affine3f pos);
@@ -56,8 +59,21 @@ class AirsimPlannerBridge {
   Pose airsimPoseFromWorld(Pose pos);
   Eigen::Affine3f airsimPoseFromWorld(Eigen::Affine3f pos);
 
+  bool goalReached(Eigen::Affine3f eigen_pose) override;
+  bool isGoalReachible(Eigen::Affine3f current_pose, Eigen::Affine3f goal_pose) override;
+  BridgeStatus getStatus() override;
+  
+  void setThresholds(float dist_threshold, float angle_threshold) {
+    dist_threshold_ = dist_threshold;
+    angle_threshold_ = angle_threshold;
+  }
+
  private:
   msr::airlib::MultirotorRpcLibClient client;
+
+  Eigen::Affine3f current_goal_;
+  float dist_threshold_ = 0.1;
+  float angle_threshold_ = 0.15;
 };
 
 }  // namespace bridges

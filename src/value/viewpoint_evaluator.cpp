@@ -218,7 +218,7 @@ float ViewpointEvaluator::evaluateViewpointVisibleExploreExploit(
     }
 
     // Compute the value as the number of visible *surface voxels* (ignore frontier voxels)
-    return visible_frontier_voxels + 100 * semantic_value_gain;
+    return visible_frontier_voxels + 2 * semantic_value_gain;
 }
 
 }  // namespace value
