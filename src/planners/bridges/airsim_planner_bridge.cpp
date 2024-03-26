@@ -19,11 +19,14 @@ bool AirsimPlannerBridge::sendPose(Eigen::Affine3f eigen_pose) {
 
   current_goal_ = eigen_pose;
 
-  Eigen::Quaternionf rotation(eigen_pose.linear());
+  // Transform pose to airsim
+  Eigen::Affine3f airsim_pose = airsimPoseFromWorld(eigen_pose);
 
-  Pose pose = Pose(msr::airlib::Vector3r(eigen_pose.translation().x(),
-                                         eigen_pose.translation().y(),
-                                         eigen_pose.translation().z()),
+  Eigen::Quaternionf rotation(airsim_pose.linear());
+
+  Pose pose = Pose(msr::airlib::Vector3r(airsim_pose.translation().x(),
+                                         airsim_pose.translation().y(),
+                                         airsim_pose.translation().z()),
                    msr::airlib::Quaternionr(
                        rotation.w(), rotation.x(), rotation.y(), rotation.z()));
   client.simSetVehiclePose(pose, true);

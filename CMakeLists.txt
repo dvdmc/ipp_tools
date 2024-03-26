@@ -53,6 +53,7 @@ if(WITH_ROS)
     tf
     tf_conversions
     semantic_mapping
+    move_base_msgs
   )
 endif()
 
@@ -65,6 +66,7 @@ if(WITH_VOXBLOX)
   tf
   tf_conversions
   semantic_mapping
+  move_base_msgs
   voxblox
   voxblox_ros
   voxblox_msgs
