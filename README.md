@@ -4,6 +4,10 @@ This is intended to be a generic library for widely used methods in Informative 
 It is designed with IPP and AP in mind but it can potentially be used for simple path planning.
 The structure is intended to be agnostic to the configuration space with particular definitions for 2D and 3D.
 
+<p float="center" align="middle">
+  <img src="media/planning.png" width="50%"/>
+</p>
+
 ## Dependencies 
 
 This code depends on the [semantic_mapping](https://github.com/dvdmc/semantic_mapping) library. 
@@ -29,8 +33,8 @@ catkin build ipp_tools
 
 ## Structure
 - `ipp_tools/common/`: definition of action spaces, map limits, cameras (parameters, frustum checks, etc.), generic node for planning. When possible, the number of dimensions can be configured to 2 or 3. 
-- `ipp_tools/samplers`: pose sampling algorithms.
-- `ipp_tools/value`: information value gain estimation algorithms. Some of them depend on the `semantic_mapping` package by using the information structure and fusion for semantic measurements.
+- `ipp_tools/samplers`: pose sampling algorithms. See Figure (a).
+- `ipp_tools/value`: information value gain estimation algorithms. Some of them depend on the `semantic_mapping` package by using the information structure and fusion for semantic measurements. See Figure (b)-(c).
 - `ipp_tools/planners`: includes different planners and bridges to send poses to different simulators, and robot planning frameworks (e.g., navigation stack).
 - `ipp_tools/maps`: abstract classes that work as wrappers for generic maps and external libraries. They include different functions used in the planners that every map should implement.
 
