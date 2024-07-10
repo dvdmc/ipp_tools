@@ -14,17 +14,21 @@ MoveBasePlannerBridge::MoveBasePlannerBridge(ros::NodeHandle &nh) : nh_(nh), mov
 
 MoveBasePlannerBridge::~MoveBasePlannerBridge() {}
 
-bool MoveBasePlannerBridge::sendPose(geometry_msgs::Pose pose) {
-  Eigen::Vector3f current_translation(pose.position.x, pose.position.y, pose.position.z);
-  Eigen::Quaternionf current_rotation(pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z);
+bool MoveBasePlannerBridge::sendPose(geometry_msgs::PoseStamped pose) {
+  Eigen::Vector3f current_translation(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z);
+  Eigen::Quaternionf current_rotation(pose.pose.orientation.w, pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z);
   current_goal_ = Eigen::Affine3f::Identity();
   current_goal_.translation() = current_translation;
   current_goal_.linear() = current_rotation.toRotationMatrix();
 
   move_base_msgs::MoveBaseGoal goal;
-  goal.target_pose.header.frame_id = "map";
-  goal.target_pose.header.stamp = ros::Time::now();
-  goal.target_pose.pose = pose;
+  goal.target_pose.header.frame_id = pose.header.frame_id;
+  goal.target_pose.header.stamp = pose.header.stamp;
+  geometry_msgs::PoseStamped goal_pose;
+  goal_pose.header = pose.header;
+  goal_pose.pose = pose.pose;
+
+  goal.target_pose.pose = goal_pose.pose;
   goal.target_pose.pose.position.z = 0.0;
 
   move_base_client_.sendGoal(goal);
@@ -37,7 +41,7 @@ bool MoveBasePlannerBridge::sendPose(Eigen::Affine3f eigen_pose) {
   current_goal_ = eigen_pose;
 
   move_base_msgs::MoveBaseGoal goal;
-  goal.target_pose.header.frame_id = "map";
+  goal.target_pose.header.frame_id = "map"; // TODO: This is assumed. Fix in the future.
   goal.target_pose.header.stamp = ros::Time::now();
   goal.target_pose.pose.position.x = eigen_pose.translation().x();
   goal.target_pose.pose.position.y = eigen_pose.translation().y();

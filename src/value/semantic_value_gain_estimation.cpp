@@ -23,9 +23,9 @@ float SemanticValueGainEstimation::evaluateInformationGain(
     Eigen::VectorXf class_ps = model->getEstimatedClassProbabilities(
         voxel_position, camera, voxel_info);
 
-    // Uncertainties are assumed to be 0.1 for all classes
+    // Uncertainties are assumed to be 0.00001f (Initial in VoxelInfo is 0.001f by default)
     Eigen::MatrixXf uncertainties =
-        Eigen::MatrixXf::Ones(voxel_info->getNumClasses(), 1) * 0.001f;
+        Eigen::MatrixXf::Ones(voxel_info->getNumClasses(), 1) * 0.00001f;
 
     // Samples count is one and the ground truth class count is 0 as it won't be
     // used

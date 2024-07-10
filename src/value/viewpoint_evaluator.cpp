@@ -201,10 +201,12 @@ float ViewpointEvaluator::evaluateViewpointVisibleExploreExploit(
                                  v_is_point_visible);
 
     // Compute the value as the number of visible frontier voxels
-    int visible_frontier_voxels = 0;
+    // int visible_frontier_voxels = 0;
+    float frontiers_value_gain = 0.0;
     for (int i = 0; i < frontier_voxels.size(); i++) {
         if (v_is_point_visible[i]) {
-            visible_frontier_voxels++;
+            // visible_frontier_voxels++; // This will have an entropy reduction depending on the number of classes
+            frontiers_value_gain += semantic_value_gain_estimation->getMaxInformationGain();
         }
     }
 
@@ -218,7 +220,7 @@ float ViewpointEvaluator::evaluateViewpointVisibleExploreExploit(
     }
 
     // Compute the value as the number of visible *surface voxels* (ignore frontier voxels)
-    return visible_frontier_voxels + 2 * semantic_value_gain;
+    return frontiers_value_gain + 3 * semantic_value_gain;
 }
 
 }  // namespace value

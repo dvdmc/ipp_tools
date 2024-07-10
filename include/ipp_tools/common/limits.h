@@ -54,6 +54,37 @@ class BoundingVolume : public Limits<3>{
   }
 };
 
+class BoundingVolumeIterator {
+ public:
+  BoundingVolumeIterator(const BoundingVolume &volume, const float &step)
+      : volume_(volume), step_(step) {
+    current_ = volume_.min;
+  }
+
+  Eigen::Vector3f next() {
+    Eigen::Vector3f next = current_;
+    current_.x() += step_;
+    if (current_.x() > volume_.max.x()) {
+      current_.x() = volume_.min.x();
+      current_.y() += step_;
+      if (current_.y() > volume_.max.y()) {
+        current_.y() = volume_.min.y();
+        current_.z() += step_;
+      }
+    }
+    return next;
+  }
+
+  bool hasNext() {
+    return current_.z() <= volume_.max.z();
+  }
+
+  private:
+    BoundingVolume volume_;
+    float step_;
+    Eigen::Vector3f current_;
+};
+
 class Polygonal3DVolume {
  public:
   Polygonal3DVolume(std::vector<Eigen::Vector2f> _vertices, Eigen::Vector2f _height_limits)
@@ -71,6 +102,7 @@ class Polygonal3DVolume {
           Eigen::Vector3f normal(normal2d.x(), normal2d.y(), 0);
           normals.push_back(normal);
           centers.push_back(center);
+          half_sizes.push_back(edge.norm() / 2);
         }
       }
   ~Polygonal3DVolume() {}
@@ -83,12 +115,44 @@ class Polygonal3DVolume {
     }
 
     for (int i = 0; i < normals.size(); i++) {
-      if ((centers[i]-point).dot(normals[i]) > 0)
+      // We first check if the point is within the region of interest of a wall
+      // Move the point to the center of the wall coord
+      Eigen::Vector2f v_p_c = Eigen::Vector2f(point.x(), point.y()) - Eigen::Vector2f(centers[i].x(), centers[i].y());
+      // Project the point on the normal
+      float proj_c_n = v_p_c.dot(normals[i].head<2>());
+      // Get the distance from the point to the projected point
+      float dist_p_n = (v_p_c - proj_c_n * normals[i].head<2>()).norm();
+      if (dist_p_n < half_sizes[i])
       {
-        return false;
+        if ((centers[i]-point).dot(normals[i]) > 0)
+        {
+          return false;
+        }
       }
     }
     return true;
+  }
+
+  BoundingVolume getBoundingVolume() const {
+    Eigen::Vector3f min = Eigen::Vector3f(vertices[0].x(), vertices[0].y(), height_limits.x());
+    Eigen::Vector3f max = Eigen::Vector3f(vertices[0].x(), vertices[0].y(), height_limits.y());
+    for (int i = 1; i < vertices.size(); i++) {
+      min.x() = std::min(min.x(), vertices[i].x());
+      min.y() = std::min(min.y(), vertices[i].y());
+      max.x() = std::max(max.x(), vertices[i].x());
+      max.y() = std::max(max.y(), vertices[i].y());
+    }
+    return BoundingVolume(min, max);
+  }
+
+  Eigen::Vector3f getCenter() const {
+    // TODO: In the future, this should be the avg of the
+    // 3 or 4 closest centers to avoid weird shapes affecting
+    Eigen::Vector3f center = Eigen::Vector3f::Zero();
+    for (int i = 0; i < centers.size(); i++) {
+      center += centers[i];
+    }
+    return center / centers.size();
   }
 
   // Overload << operator to print the polygonal volume
@@ -112,7 +176,42 @@ class Polygonal3DVolume {
 
   std::vector<Eigen::Vector2f> vertices;
   std::vector<Eigen::Vector3f> normals, centers;
+  std::vector<float> half_sizes;
   Eigen::Vector2f height_limits;
+};
+
+class Polygonal3DVolumeIterator {
+ /*
+  This makes use of the BoundingVolume class to iterate over the volume
+  and just checks if the point is inside the polygonal volume
+ */
+ public:
+  Polygonal3DVolumeIterator(const Polygonal3DVolume &volume, const float &step)
+      : volume_(volume), step_(step), bounding_volume_iterator_(volume.getBoundingVolume(), step) {
+    current_ = bounding_volume_iterator_.next();
+  }
+
+  Eigen::Vector3f next() {
+    Eigen::Vector3f next = current_;
+    current_ = bounding_volume_iterator_.next();
+    while (!volume_.contains(current_)) {
+      if (!bounding_volume_iterator_.hasNext()) {
+        break;
+      }
+      current_ = bounding_volume_iterator_.next();
+    }
+    return next;
+  }
+
+  bool hasNext() {
+    return bounding_volume_iterator_.hasNext();
+  }
+
+  private:
+    Polygonal3DVolume volume_;
+    float step_;
+    BoundingVolumeIterator bounding_volume_iterator_;
+    Eigen::Vector3f current_;
 };
 
 } // namespace common

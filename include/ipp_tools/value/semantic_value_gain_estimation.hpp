@@ -93,6 +93,7 @@ class SemanticDistanceModel : public SemanticEstimationModel {
 
 class SemanticValueGainEstimation {
    public:
+
     /**
      * @brief Construct a new Semantic Value Gain Estimation object
      * @param voxel_hash_map Voxel hash map
@@ -116,6 +117,14 @@ class SemanticValueGainEstimation {
     float evaluateInformationGain(const Eigen::Affine3f &camera,
                                   const Eigen::Vector3f &voxel_position,
                                   SemanticEstimationModel *model, bool skip_other_class=true) const;
+
+    /**
+     * @brief Get the maximum information gain, which is defined as the negative entropy reduction from a uniform
+     * distribution to a distribution with a single class with probability 1
+     * 
+     * @return float Maximum information gain
+    */
+    float getMaxInformationGain() const { return - std::log(1.0 / voxel_hash_map_->getNumClasses()); }
 
    private:
     std::shared_ptr<semantic_mapping::VoxelHashMap> voxel_hash_map_;

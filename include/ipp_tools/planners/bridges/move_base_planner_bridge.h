@@ -35,7 +35,7 @@ class MoveBasePlannerBridge : public BasePlannerBridge {
     ~MoveBasePlannerBridge();
 
     bool sendPose(Eigen::Affine3f eigen_pose) override;
-    bool sendPose(geometry_msgs::Pose pose);
+    bool sendPose(geometry_msgs::PoseStamped pose);
 
     bool goalReached(Eigen::Affine3f current_pose) override;
     bool isGoalReachible(Eigen::Affine3f current_pose,
