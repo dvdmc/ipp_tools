@@ -1,27 +1,42 @@
 # Informative Path Planning (IPP) tools
 
-This is intended to be a generic library for widely used methods in Informative Path Planning or Active Perception in robotics. It is designed with IPP and AP in mind but it can potentially be used for simple path planning.
-
+This is intended to be a generic library for widely used methods in Informative Path Planning or Active Perception in robotics.
+It is designed with IPP and AP in mind but it can potentially be used for simple path planning.
 The structure is intended to be agnostic to the configuration space with particular definitions for 2D and 3D.
 
-## Integration with your code
+<p float="center" align="middle">
+  <img src="media/planning.png" width="50%"/>
+</p>
 
-Right now, this is plain code that has to be manually integrated. In the future, a proper library will be built around it.
+## Dependencies 
 
-## Requirements
+This code depends on the [semantic_mapping](https://github.com/dvdmc/semantic_mapping) library. 
+In the future, we plan on removing this dependency by creating wrappers around the library.
+The library also depends on Eigen3. The bridges have different dependencies that can be 
+configured in the `CMakeLists.txt` for using Airsim, Voxblox, or ROS. Some modules might become
+unavailable if the dependencies are deactivated.
 
-The executables in this code are created for ROS 2. There are dependencies on the Eigen3 library and the navigation2 package.
+## Installation
 
-## Simple tests
-
-Right now only RRT is implemented. You can test it by executing the following command:
-
-`ros2 run ipp_tools rrt_test`
-
-If you want to test the plugin for the navigation2 package, you should execute:
+Clone the repository with:
 
 ```
-export TURTLEBOT3_MODEL=waffle
-export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/opt/ros/$ROS_DISTRO/share/turtlebot3_gazebo/models
-ros2 launch nav2_bringup tb3_simulation_launch.py params_file:=./src/ipp_tools/ipp_tools_ros/params/nav2_params.yaml headless:=False
+git clone https://github.com/dvdmc/ipp_tools
 ```
+
+Currently, this code is intended to be used as a library or examples. You can include this library
+in other projects. The easier way is using ROS and compiling with:
+
+```
+catkin build ipp_tools
+```
+
+## Structure
+- `ipp_tools/common/`: definition of action spaces, map limits, cameras (parameters, frustum checks, etc.), generic node for planning. When possible, the number of dimensions can be configured to 2 or 3. 
+- `ipp_tools/samplers`: pose sampling algorithms. See Figure (a).
+- `ipp_tools/value`: information value gain estimation algorithms. Some of them depend on the `semantic_mapping` package by using the information structure and fusion for semantic measurements. See Figure (b)-(c).
+- `ipp_tools/planners`: includes different planners and bridges to send poses to different simulators, and robot planning frameworks (e.g., navigation stack).
+- `ipp_tools/maps`: abstract classes that work as wrappers for generic maps and external libraries. They include different functions used in the planners that every map should implement.
+
+
+
