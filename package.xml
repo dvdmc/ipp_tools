@@ -15,6 +15,7 @@
   <depend>move_base_msgs</depend>
   <depend>tf</depend>
   <depend>tf_conversions</depend>
+  <depend>core_tools</depend>
   <depend>semantic_mapping</depend>
   <depend>semantic_mapping_ros</depend>
   <depend>voxblox</depend>

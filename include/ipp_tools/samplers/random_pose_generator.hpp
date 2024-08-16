@@ -19,7 +19,8 @@
 
 #include <Eigen/Dense>
 
-#include "ipp_tools/common/limits.h"
+#include "core_tools/limits.h"
+#include "core_tools/random.h"
 
 // Two templated classes for Affine2D and Affine3D
 
@@ -37,9 +38,8 @@ class RandomPoseGenerator;
 template <>
 class RandomPoseGenerator<Eigen::Affine2f> {
    public:
-    RandomPoseGenerator(const common::Limits<3>& limits,
-                        unsigned int seed = std::random_device()())
-        : generator_(seed),
+    RandomPoseGenerator(const core_tools::Limits<3>& limits)
+        : generator_(core_tools::get_global_random_generator()),
           x_distribution_(limits.min(0), limits.max(0)),
           y_distribution_(limits.min(1), limits.max(1)),
           yaw_distribution_(limits.min(2), limits.max(2)) {}
@@ -66,9 +66,8 @@ class RandomPoseGenerator<Eigen::Affine2f> {
 template <>
 class RandomPoseGenerator<Eigen::Affine3f> {
    public:
-    RandomPoseGenerator(const common::Limits<6>& limits,
-                        unsigned int seed = std::random_device()())
-        : generator_(seed),
+    RandomPoseGenerator(const core_tools::Limits<6>& limits)
+        : generator_(core_tools::get_global_random_generator()),
           x_distribution_(limits.min(0), limits.max(0)),
           y_distribution_(limits.min(1), limits.max(1)),
           z_distribution_(limits.min(2), limits.max(2)),

@@ -20,7 +20,7 @@
 
 #include <Eigen/Dense>
 
-#include <ipp_tools/common/cameras.h>
+#include <core_tools/cameras.h>
 
 #include <ipp_tools/value/semantic_value_gain_estimation.hpp>
 
@@ -32,7 +32,7 @@ class ViewpointEvaluator {
     /**
      * @brief Construct a new Viewpoint Evaluator object
      */
-    ViewpointEvaluator(common::CameraData _camera_data);
+    ViewpointEvaluator(core_tools::CameraData _camera_data);
 
     /**
      * @brief Destroy the Viewpoint Evaluator object
@@ -52,7 +52,7 @@ class ViewpointEvaluator {
      * @brief Get camera data
      * @return CameraData
      */
-    const common::CameraData &getCameraData() const { return *camera_data_; }
+    const core_tools::CameraData &getCameraData() const { return *camera_data_; }
 
     /**
      * @brief Get the bounding box of the camera frustrum including camera
@@ -135,7 +135,7 @@ class ViewpointEvaluator {
         SemanticEstimationModel *semantic_estimation_model);
 
    private:
-    std::unique_ptr<common::CameraData> camera_data_;
+    std::unique_ptr<core_tools::CameraData> camera_data_;
 };
 
 }  // namespace value

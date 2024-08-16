@@ -22,7 +22,7 @@
 #include <semantic_mapping/VoxelHashMap.hpp>
 #include <semantic_mapping/VoxelIntegrator.hpp>
 
-#include <ipp_tools/common/cameras.h>
+#include <core_tools/cameras.h>
 
 namespace ipp_tools {
 namespace value {

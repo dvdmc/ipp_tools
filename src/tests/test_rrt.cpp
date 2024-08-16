@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "ipp_tools/planners/rrt.h"
-#include "ipp_tools/common/limits.h"
+#include "core_tools/limits.h"
 #include "ipp_tools/maps/test_map.h"
 
 // This code is used to test the RRT algorithm
@@ -13,12 +13,12 @@ int main(int argc, char** argv)
 {
     std::cout << "Starting test" << std::endl;
     double resolution = 0.1;
-    ipp_tools::common::Limits<3> limits(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(10, 10, 0));
+    core_tools::Limits<3> limits(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(10, 10, 0));
     // Initialize the map
     ipp_tools::maps::TestMap map(resolution);
     std::shared_ptr<ipp_tools::maps::TestMap> map_ptr = std::make_shared<ipp_tools::maps::TestMap>(map);
     // Initialize the RRT planner
-    ipp_tools::planners::RRT<Eigen::Affine2f, Eigen::Vector2f, ipp_tools::common::Limits<3>> rrt(map_ptr, limits);
+    ipp_tools::planners::RRT<Eigen::Affine2f, Eigen::Vector2f, core_tools::Limits<3>> rrt(map_ptr, limits);
 
     // Set the start and goal points
     Eigen::Affine2f start(Eigen::Translation2f(-4.5, -4.5));

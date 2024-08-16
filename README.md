@@ -32,7 +32,7 @@ catkin build ipp_tools
 ```
 
 ## Structure
-- `ipp_tools/common/`: definition of action spaces, map limits, cameras (parameters, frustum checks, etc.), generic node for planning. When possible, the number of dimensions can be configured to 2 or 3. 
+- `core_tools/`: definition of action spaces, map limits, cameras (parameters, frustum checks, etc.), generic node for planning. When possible, the number of dimensions can be configured to 2 or 3. 
 - `ipp_tools/samplers`: pose sampling algorithms. See Figure (a).
 - `ipp_tools/value`: information value gain estimation algorithms. Some of them depend on the `semantic_mapping` package by using the information structure and fusion for semantic measurements. See Figure (b)-(c).
 - `ipp_tools/planners`: includes different planners and bridges to send poses to different simulators, and robot planning frameworks (e.g., navigation stack).

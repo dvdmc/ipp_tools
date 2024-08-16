@@ -1,7 +1,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "ipp_tools/common/actions.h"
+#include "core_tools/actions.h"
+#include "ipp_tools/samplers/action_space_sampler.hpp"
 
 // This code is used to test the actions algorithms
 // It generates an instance of the actions space and samples
@@ -10,9 +11,9 @@ int main(int argc, char** argv)
 {
     std::cout << "Starting test" << std::endl;
     // Initialize the action space
-    ipp_tools::common::ActionSpace<4> action_space({"x", "y", "z", "yaw"}, Eigen::Vector4f(-1, -1, -1, -1), Eigen::Vector4f(1, 1, 1, 1));
+    core_tools::ActionSpace<4> action_space({"x", "y", "z", "yaw"}, Eigen::Vector4f(-1, -1, -1, -1), Eigen::Vector4f(1, 1, 1, 1));
     // Sample actions
-    std::vector<Eigen::Matrix<float, 4, 1>> actions = action_space.sample(3); // 4 per axis
+    std::vector<Eigen::Matrix<float, 4, 1>> actions = ipp_tools::samplers::sample_action_space_uniform(3, action_space); // 4 per axis
 
     // Print the sampled actions
     for (int i = 0; i < actions.size(); i++)
@@ -23,7 +24,7 @@ int main(int argc, char** argv)
     std::cout << "Second test" << std::endl;
     // Sample actions with different number of samples per dimension (3,2,3,1)
     std::vector<int> v_n = {3, 2, 3, 1};
-    actions = action_space.sample(v_n);
+    actions = ipp_tools::samplers::sample_action_space_uniform(v_n, action_space);
 
     // Print the sampled actions
     for (int i = 0; i < actions.size(); i++)

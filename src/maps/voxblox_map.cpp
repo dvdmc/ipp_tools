@@ -149,7 +149,7 @@ float VoxbloxMap::getVoxelWeight(const Eigen::Vector3f &point) {
 float VoxbloxMap::getMaximumWeight() { return c_maximum_weight_; }
 
 void VoxbloxMap::getTsdfVoxelsBoundingBox(
-    const common::BoundingVolume &bounding_box,
+    const core_tools::BoundingVolume &bounding_box,
     voxblox::HierarchicalIndexMap *block_voxel_list) {
     CHECK_NOTNULL(block_voxel_list);
 
@@ -205,7 +205,7 @@ void VoxbloxMap::getTsdfVoxelsBoundingBox(
 }
 
 void VoxbloxMap::getOccupiedPositionsBoundingBox(
-    const common::BoundingVolume &bounding_box,
+    const core_tools::BoundingVolume &bounding_box,
     std::vector<Eigen::Vector3f> &occupied_position) {
     const voxblox::FloatingPoint delta_x =
         bounding_box.max[0] - bounding_box.min[0];

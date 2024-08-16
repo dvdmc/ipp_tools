@@ -11,7 +11,7 @@
 #include <voxblox_ros/esdf_server.h>
 #include <memory>
 
-#include "ipp_tools/common/limits.h"
+#include "core_tools/limits.h"
 #include "ipp_tools/maps/tsdf_map.h"
 
 namespace ipp_tools
@@ -62,11 +62,11 @@ class VoxbloxMap : public TSDFMap<Eigen::Vector3f> {
   // Utilities for extracting voxels in a query bounding box
   // TODO: Check this function
   void getTsdfVoxelsBoundingBox(
-      const ipp_tools::common::BoundingVolume &bounding_box,
+      const core_tools::BoundingVolume &bounding_box,
       voxblox::HierarchicalIndexMap *block_voxel_list);
 
   void getOccupiedPositionsBoundingBox(
-      const common::BoundingVolume &bounding_box,
+      const core_tools::BoundingVolume &bounding_box,
       std::vector<Eigen::Vector3f> &occupied_position);
 
   Eigen::Vector3f getNormalAtPosition(const Eigen::Vector3f &voxel);

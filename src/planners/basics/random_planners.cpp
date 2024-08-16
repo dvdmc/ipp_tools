@@ -8,8 +8,8 @@ Random3dPlanner::Random3dPlanner() : BasePlanner<Eigen::Affine3f>(), is_setup_(f
 
 bool Random3dPlanner::setup(
     std::shared_ptr<ipp_tools::maps::Map<Eigen::Vector3f>> map, int num_steps,
-    ipp_tools::common::ActionSpace<4> action_space,
-    ipp_tools::common::Polygonal3DVolume map_volume) {
+    core_tools::ActionSpace<4> action_space,
+    core_tools::Polygonal3DVolume map_volume) {
     is_setup_ = true;
     std::cout << "Setting up random planner" << std::endl;
     std::cout << "Action space: " << action_space.min.transpose() << " "
@@ -17,22 +17,22 @@ bool Random3dPlanner::setup(
     map_ = map;
     num_steps_ = num_steps;
     yaw_action_space_ =
-        std::make_unique<ipp_tools::common::ActionSpace<4>>(action_space);
+        std::make_unique<core_tools::ActionSpace<4>>(action_space);
 
     // Create a new action space with 0,0 for pitch and roll
     Eigen::Matrix<float, 6, 1> min;
     Eigen::Matrix<float, 6, 1> max;
     min << action_space.min(0), action_space.min(1), action_space.min(2), 0, 0, action_space.min(3);
     max << action_space.max(0), action_space.max(1), action_space.max(2), 0, 0, action_space.max(3);
-    ipp_tools::common::Limits<6> limits(min, max);
+    core_tools::Limits<6> limits(min, max);
 
     // TODO: Check how to cast the action space to limits
     std::vector<std::string> names{"x", "y", "z", "roll", "pitch", "yaw"};
     action_space_ =
-        std::make_unique<ipp_tools::common::ActionSpace<6>>(names, min, max);
+        std::make_unique<core_tools::ActionSpace<6>>(names, min, max);
 
     map_volume_ =
-        std::make_unique<ipp_tools::common::Polygonal3DVolume>(map_volume);
+        std::make_unique<core_tools::Polygonal3DVolume>(map_volume);
 
     pose_generator_ = std::make_unique<
         ipp_tools::samplers::RandomPoseGenerator<Eigen::Affine3f>>(limits);

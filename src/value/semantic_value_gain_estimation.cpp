@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "ipp_tools/value/semantic_value_gain_estimation.hpp"
 
 namespace ipp_tools {
@@ -23,9 +25,18 @@ float SemanticValueGainEstimation::evaluateInformationGain(
     Eigen::VectorXf class_ps = model->getEstimatedClassProbabilities(
         voxel_position, camera, voxel_info);
 
+    Eigen::MatrixXf uncertainties;
     // Uncertainties are assumed to be 0.00001f (Initial in VoxelInfo is 0.001f by default)
-    Eigen::MatrixXf uncertainties =
-        Eigen::MatrixXf::Ones(voxel_info->getNumClasses(), 1) * 0.00001f;
+    if(voxel_integrator_->getUncertaintyType() == semantic_mapping::UncertaintyType::UNCERTAINTY)
+    {
+        uncertainties =
+            Eigen::MatrixXf::Ones(voxel_info->getNumClasses(), 1) * 0.00001f;
+    } else if (voxel_integrator_->getUncertaintyType() == semantic_mapping::UncertaintyType::CONFIDENCE) {
+        uncertainties = Eigen::MatrixXf::Ones(voxel_info->getNumClasses(), 1);
+    } else
+    {
+        throw std::runtime_error("Unknown uncertainty type");
+    }   
 
     // Samples count is one and the ground truth class count is 0 as it won't be
     // used

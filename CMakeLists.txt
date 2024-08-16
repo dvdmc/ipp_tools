@@ -65,6 +65,7 @@ if(WITH_VOXBLOX)
   geometry_msgs
   tf
   tf_conversions
+  core_tools
   semantic_mapping
   move_base_msgs
   voxblox
@@ -110,6 +111,7 @@ include_directories(
 endif()
 
 add_library(ipp_tools
+src/planners/bridges/dummy_planner_bridge.cpp
 src/planners/basics/poses_file_planner.cpp
 src/planners/basics/random_planners.cpp
 src/value/viewpoint_evaluator.cpp

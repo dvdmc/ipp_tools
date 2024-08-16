@@ -4,9 +4,9 @@
 namespace ipp_tools {
 namespace value {
 
-ViewpointEvaluator::ViewpointEvaluator(common::CameraData _camera_data)
+ViewpointEvaluator::ViewpointEvaluator(core_tools::CameraData _camera_data)
 {
-    camera_data_ = std::make_unique<common::CameraData>(_camera_data);
+    camera_data_ = std::make_unique<core_tools::CameraData>(_camera_data);
 }
 
 // TODO: All of this can be done in vectorized form

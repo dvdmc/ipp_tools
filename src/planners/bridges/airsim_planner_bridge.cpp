@@ -115,7 +115,8 @@ bool AirsimPlannerBridge::isGoalReachible(Eigen::Affine3f current_pose, Eigen::A
                    msr::airlib::Quaternionr(
                        rotation.w(), rotation.x(), rotation.y(), rotation.z()));
 
-  return client.simIsPointOccupied(pose.position, 2.0);
+  // return client.simIsPointOccupied(pose.position, 0.1);
+  return true;
 }
 
 BridgeStatus AirsimPlannerBridge::getStatus() {

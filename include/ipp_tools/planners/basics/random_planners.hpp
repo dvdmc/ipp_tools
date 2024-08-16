@@ -25,8 +25,8 @@
 #include <vector>
 
 #include <ipp_tools/maps/map.h>
-#include <ipp_tools/common/actions.h>
-#include <ipp_tools/common/limits.h>
+#include <core_tools/actions.h>
+#include <core_tools/limits.h>
 #include <ipp_tools/samplers/random_pose_generator.hpp>
 #include <ipp_tools/planners/base_planner.h>
 
@@ -52,8 +52,8 @@ class Random3dPlanner : public BasePlanner<Eigen::Affine3f> {
      */
     bool setup(std::shared_ptr<ipp_tools::maps::Map<Eigen::Vector3f>> map,
                int num_steps,
-               ipp_tools::common::ActionSpace<4> action_space,
-               ipp_tools::common::Polygonal3DVolume map_volume);
+               core_tools::ActionSpace<4> action_space,
+               core_tools::Polygonal3DVolume map_volume);
 
     /**
      * @brief Plan using the configuration in the param map
@@ -81,9 +81,9 @@ class Random3dPlanner : public BasePlanner<Eigen::Affine3f> {
    private:
     std::shared_ptr<ipp_tools::maps::Map<Eigen::Vector3f>> map_;
     int num_steps_;
-    std::unique_ptr<ipp_tools::common::ActionSpace<4>> yaw_action_space_;
-    std::unique_ptr<ipp_tools::common::ActionSpace<6>> action_space_;
-    std::unique_ptr<ipp_tools::common::Polygonal3DVolume> map_volume_;
+    std::unique_ptr<core_tools::ActionSpace<4>> yaw_action_space_;
+    std::unique_ptr<core_tools::ActionSpace<6>> action_space_;
+    std::unique_ptr<core_tools::Polygonal3DVolume> map_volume_;
     std::unique_ptr<ipp_tools::samplers::RandomPoseGenerator<Eigen::Affine3f>> pose_generator_;
     std::vector<Eigen::Affine3f> path_;
 
